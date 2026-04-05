@@ -343,6 +343,9 @@
     document.getElementById('enterBtn').addEventListener('click', function() {
       if (!connected) return;
       ws.send(JSON.stringify({ type: 'enter' }));
+      textInput.value = '';
+      charCount.textContent = '0';
+      lastSyncedText = '';
       showSyncHint('已发送回车');
     });
 
