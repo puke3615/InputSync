@@ -1,0 +1,9 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for InputSync",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open"
+  ]
+}

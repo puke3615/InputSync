@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InputSync</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-bg: #eef2ff;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text2: #64748b;
+    --text3: #94a3b8;
+    --border: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    height: 100vh; display: flex; flex-direction: column;
+    user-select: none; -webkit-font-smoothing: antialiased;
+  }
+  .main {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px; overflow-y: auto;
+  }
+  .content { width: 100%; max-width: 360px; text-align: center; }
+  h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+  .subtitle { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+  .qr-box {
+    display: inline-block; background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .qr-box img { display: block; width: 180px; height: 180px; image-rendering: pixelated; }
+  .qr-tip { font-size: 11px; color: var(--text3); margin-bottom: 14px; }
+  .url-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .url-bar code {
+    flex: 1; font-size: 13px; color: var(--primary); font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .url-bar button {
+    font-size: 11px; font-weight: 600; color: var(--primary); background: var(--primary-bg);
+    border: none; border-radius: 5px; padding: 4px 8px; cursor: pointer;
+  }
+  .ip-bar {
+    display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 12px;
+  }
+  .ip-bar label { font-size: 11px; color: var(--text3); }
+  .ip-bar select {
+    font-size: 11px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 5px;
+    background: #fff; color: var(--text); font-family: 'SF Mono', monospace;
+  }
+  .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 500; margin-bottom: 12px;
+  }
+  .status.wait { background: #f1f5f9; color: var(--text2); border: 1px solid var(--border); }
+  .status.ok { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+  .status .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .status.ok .dot { animation: pulse 2s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .alert {
+    text-align: left; background: var(--warning-bg); border: 1px solid #fde68a;
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 12px;
+  }
+  .alert b { color: var(--warning); }
+  .alert p { color: #78350f; line-height: 1.5; margin: 4px 0 8px; }
+  .alert button {
+    font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none;
+  }
+  .alert .abtn { color: #fff; background: var(--warning); }
+  .alert .abtn2 { color: var(--warning); background: transparent; border: 1px solid #fde68a; margin-left: 4px; }
+  .hint { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .footer { text-align: center; padding: 8px; font-size: 10px; color: var(--text3); border-top: 1px solid var(--border); }
+
+  /* Debug Panel */
+  .debug-bar {
+    display: flex; justify-content: flex-end; padding: 4px 8px;
+    position: relative; z-index: 10;
+  }
+  .debug-bar button {
+    font-size: 10px; color: var(--text3); background: none;
+    border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; cursor: pointer;
+  }
+  #debugPanel {
+    display: none; max-height: 180px; overflow-y: auto; margin: 0 8px 4px;
+    background: #1e293b; color: #a5f3fc; font-family: 'SF Mono', monospace;
+    font-size: 10px; line-height: 1.6; padding: 6px 8px; border-radius: 6px;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  #debugPanel.show { display: block; }
+
+  /* Loader */
+  #loader {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px; background: var(--bg); z-index: 10;
+  }
+  #loader.hide { display: none; }
+  .spin {
+    width: 28px; height: 28px; border: 3px solid var(--border);
+    border-top-color: var(--primary); border-radius: 50%; animation: sp .7s linear infinite;
+  }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  #loaderMsg { font-size: 13px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="spin" id="spinner"></div>
+  <div id="loaderMsg">正在启动服务...</div>
+</div>
+
+<div class="debug-bar">
+  <button id="debugToggle">调试日志</button>
+</div>
+<div id="debugPanel"></div>
+
+<div class="main">
+  <div class="content" id="content" style="display:none;">
+    <h1>InputSync</h1>
+    <p class="subtitle">局域网语音输入同步</p>
+    <div class="qr-box"><img id="qrImg" alt="" /></div>
+    <div class="qr-tip">手机扫码连接</div>
+    <div class="url-bar">
+      <code id="urlText">-</code>
+      <button id="copyBtn">复制</button>
+    </div>
+    <div class="ip-bar" id="ipBar" style="display:none;">
+      <label>网卡:</label>
+      <select id="ipSel"></select>
+    </div>
+    <div class="status wait" id="statusBadge">
+      <span class="dot"></span>
+      <span id="statusLabel">等待手机连接</span>
+    </div>
+    <div class="alert" id="permBox" style="display:none;">
+      <b>⚠️ 需要辅助功能权限</b>
+      <p>InputSync 需要「辅助功能」权限才能模拟键盘输入。请在系统设置中授权。</p>
+      <button class="abtn" id="openPermBtn">打开系统设置</button>
+      <button class="abtn2" id="recheckPermBtn">重新检测</button>
+    </div>
+    <p class="hint">手机扫描二维码，或在浏览器输入上方地址</p>
+  </div>
+</div>
+
+<div class="footer">InputSync v1.0 · 局域网通信 · 无需云服务</div>
+
+<script>
+(function() {
+  var logs = [];
+  var debugVisible = false;
+  var invoke = null;
+  var listen = null;
+  var serverUrl = '';
+  var serverPort = 5678;
+
+  // ─── Debug Log ───
+  document.getElementById('debugToggle').addEventListener('click', function() {
+    debugVisible = !debugVisible;
+    document.getElementById('debugPanel').classList.toggle('show', debugVisible);
+  });
+
+  function log(msg) {
+    var t = new Date().toLocaleTimeString();
+    var line = '[' + t + '] ' + msg;
+    logs.push(line);
+    if (logs.length > 300) logs.shift();
+    var el = document.getElementById('debugPanel');
+    el.textContent = logs.join('\n');
+    el.scrollTop = el.scrollHeight;
+    console.log('[InputSync]', msg);
+  }
+
+  function showLoader(msg) {
+    document.getElementById('loader').classList.remove('hide');
+    document.getElementById('loaderMsg').textContent = msg;
+  }
+
+  function hideLoader() {
+    document.getElementById('loader').classList.add('hide');
+    document.getElementById('content').style.display = '';
+  }
+
+  function showError(msg) {
+    document.getElementById('loaderMsg').textContent = msg;
+    document.getElementById('spinner').style.display = 'none';
+  }
+
+  // ─── Init ───
+  async function init() {
+    log('应用启动...');
+    showLoader('正在启动服务...');
+
+    // Detect Tauri API
+    var hasTauri = false;
+    try {
+      log('检测 Tauri API...');
+      if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
+        invoke = window.__TAURI__.core.invoke;
+        listen = window.__TAURI__.event ? window.__TAURI__.event.listen : null;
+        hasTauri = true;
+        log('Tauri API 可用');
+      } else {
+        log('window.__TAURI__ = ' + typeof window.__TAURI__);
+        if (window.__TAURI__) {
+          log('  .core = ' + typeof window.__TAURI__.core);
+        }
+        log('将使用 HTTP 备用方案');
+      }
+    } catch(e) {
+      log('Tauri 检测异常: ' + e.message);
+    }
+
+    // Load server info with retries
+    showLoader('正在获取服务信息...');
+    var info = null;
+
+    for (var i = 0; i < 20; i++) {
+      if (hasTauri && !info) {
+        try {
+          log('Tauri IPC 第' + (i+1) + '次...');
+          info = await invoke('get_server_info');
+          log('Tauri IPC 成功');
+        } catch(e) { log('Tauri IPC 失败: ' + e); }
+      }
+      if (!info) {
+        try {
+          log('HTTP API 第' + (i+1) + '次...');
+          var resp = await fetch('http://127.0.0.1:' + serverPort + '/api/info');
+          if (resp.ok) { info = await resp.json(); log('HTTP API 成功'); }
+        } catch(e) { log('HTTP 失败: ' + e.message); }
+      }
+      if (info) break;
+      log('等待 500ms...');
+      await sleep(500);
+    }
+
+    if (!info) {
+      log('ERROR: 无法获取服务信息');
+      showError('服务启动失败，请重启应用');
+      return;
+    }
+
+    // Render
+    log('渲染界面...');
+    serverUrl = info.url;
+
+    if (info.qrcode_data_url) {
+      document.getElementById('qrImg').src = info.qrcode_data_url;
+    } else if (info.qrcode) {
+      document.getElementById('qrImg').src = info.qrcode;
+    } else {
+      document.getElementById('qrImg').src = 'http://127.0.0.1:' + serverPort + '/api/qrcode';
+    }
+
+    document.getElementById('urlText').textContent = info.url;
+    log('URL: ' + info.url);
+
+    // IPs
+    var ips = [];
+    if (hasTauri) {
+      try { ips = await invoke('get_local_ips'); log(ips.length + ' 个 IP'); }
+      catch(e) { log('获取 IP 失败: ' + e); }
+    }
+    if (ips.length === 0 && info.ip) ips = [info.ip];
+
+    var sel = document.getElementById('ipSel');
+    sel.innerHTML = '';
+    ips.forEach(function(ip) {
+      var o = document.createElement('option');
+      o.value = ip; o.textContent = ip;
+      if (ip === info.ip) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (ips.length > 1) document.getElementById('ipBar').style.display = '';
+
+    hideLoader();
+    log('界面渲染完成');
+
+    // Events
+    if (listen) {
+      try {
+        listen('client-count', function(ev) {
+          var c = ev.payload.count;
+          var badge = document.getElementById('statusBadge');
+          var label = document.getElementById('statusLabel');
+          if (c > 0) {
+            badge.className = 'status ok';
+            label.textContent = c + ' 台设备已连接';
+          } else {
+            badge.className = 'status wait';
+            label.textContent = '等待手机连接';
+          }
+        });
+        log('事件监听已注册');
+      } catch(e) { log('事件监听失败: ' + e); }
+    }
+
+    // Accessibility check
+    if (hasTauri) {
+      try {
+        var ok = await invoke('check_accessibility');
+        log('辅助功能: ' + (ok ? '已授权' : '未授权'));
+        document.getElementById('permBox').style.display = ok ? 'none' : '';
+      } catch(e) { log('权限检测失败: ' + e); }
+    }
+  }
+
+  // ─── Button Events ───
+  document.getElementById('copyBtn').addEventListener('click', async function() {
+    try {
+      await navigator.clipboard.writeText(serverUrl);
+      this.textContent = '已复制✓';
+      var btn = this;
+      setTimeout(function() { btn.textContent = '复制'; }, 1200);
+    } catch(e) { log('复制失败: ' + e); }
+  });
+
+  document.getElementById('ipSel').addEventListener('change', async function() {
+    var ip = this.value;
+    serverUrl = 'http://' + ip + ':' + serverPort;
+    document.getElementById('urlText').textContent = serverUrl;
+    log('切换 IP: ' + serverUrl);
+    if (invoke) {
+      try {
+        var qr = await invoke('generate_qr', { url: serverUrl });
+        document.getElementById('qrImg').src = qr;
+      } catch(e) { log('QR 生成失败: ' + e); }
+    }
+  });
+
+  document.getElementById('openPermBtn').addEventListener('click', function() {
+    if (invoke) invoke('open_accessibility_settings');
+    log('打开系统设置');
+  });
+
+  document.getElementById('recheckPermBtn').addEventListener('click', async function() {
+    if (!invoke) return;
+    try {
+      var ok = await invoke('check_accessibility');
+      log('重新检测: ' + (ok ? '已授权' : '未授权'));
+      document.getElementById('permBox').style.display = ok ? 'none' : '';
+    } catch(e) { log('检测失败: ' + e); }
+  });
+
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  init().catch(function(e) {
+    log('FATAL: ' + e.message + '\n' + (e.stack || ''));
+    showError('启动异常: ' + e.message);
+  });
+})();
+</script>
+</body>
+</html>

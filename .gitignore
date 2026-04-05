@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Rust build output
+src-tauri/target/
+
+# Tauri auto-generated schemas (regenerated on build)
+src-tauri/gen/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursorrules
+.cursorignore
+.kiro/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Environment & secrets
+.env
+.env.*
+
+# Logs
+*.log
+
+# Temp files
+temp/
+tmp/
+.cache/
+*.bak
+*.out
+
+# Internal docs (not for distribution)
+plans/
