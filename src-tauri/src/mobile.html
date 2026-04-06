@@ -84,6 +84,22 @@
   }
   .status-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
+  .mode-bar {
+    flex-shrink: 0; display: flex; gap: 0; margin-bottom: 8px;
+    background: var(--bg-card); border-radius: 10px; padding: 3px;
+    border: 1px solid var(--border);
+  }
+  .mode-btn {
+    flex: 1; padding: 6px 0; font-size: 12px; font-weight: 600;
+    color: var(--text-muted); background: transparent; border: none;
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    -webkit-appearance: none; touch-action: manipulation;
+  }
+  .mode-btn.active {
+    background: var(--primary); color: #fff;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+  }
+
   .sync-hint {
     flex-shrink: 0; text-align: center; font-size: 11px; color: var(--text-muted);
     opacity: 0.5; margin-bottom: 8px;
@@ -233,6 +249,10 @@
     <button class="dismiss" id="dismissHintBtn">✕</button>
   </div>
 
+  <div class="mode-bar">
+    <button class="mode-btn active" id="modeBtnReplace" data-mode="replace">覆盖模式</button>
+    <button class="mode-btn" id="modeBtnAppend" data-mode="append">追加模式</button>
+  </div>
   <div id="syncHint" class="sync-hint">输入内容将实时同步到电脑</div>
 
   <div class="input-card">
@@ -289,6 +309,7 @@
 
   var KEY_CONNECTIONS = 'is_connections';
   var KEY_HOME_HINT = 'is_home_hint_dismissed';
+  var KEY_MODE = 'is_sync_mode';
 
   var ws = null;
   var connected = false;
@@ -297,6 +318,7 @@
   var syncTimer = null;
   var lastSyncedText = '';
   var composing = false;
+  var syncMode = load(KEY_MODE) || 'replace';
 
   var textInput = document.getElementById('textInput');
   var statusDot = document.getElementById('statusDot');
@@ -307,6 +329,7 @@
   init();
 
   function init() {
+    applyMode(syncMode);
     bindEvents();
     connectWS();
     saveConnection();
@@ -353,11 +376,14 @@
       textInput.value = '';
       charCount.textContent = '0';
       lastSyncedText = '';
-      if (connected) {
+      if (connected && syncMode === 'replace') {
         ws.send(JSON.stringify({ type: 'sync', text: '' }));
-        showSyncHint('已清空');
       }
+      showSyncHint('已清空');
     });
+
+    document.getElementById('modeBtnReplace').addEventListener('click', function() { applyMode('replace'); });
+    document.getElementById('modeBtnAppend').addEventListener('click', function() { applyMode('append'); });
 
     document.getElementById('settingsBtn').addEventListener('click', openPanel);
     document.getElementById('panelOverlay').addEventListener('click', closePanel);
@@ -397,6 +423,20 @@
     });
   }
 
+  // ─── Mode ───
+
+  function applyMode(mode) {
+    syncMode = mode;
+    save(KEY_MODE, mode);
+    document.getElementById('modeBtnReplace').classList.toggle('active', mode === 'replace');
+    document.getElementById('modeBtnAppend').classList.toggle('active', mode === 'append');
+    var hint = mode === 'replace'
+      ? '覆盖模式：手机内容全量替换电脑输入框'
+      : '追加模式：仅将新增内容追加到电脑光标处';
+    document.getElementById('syncHint').textContent = hint;
+    lastSyncedText = textInput.value;
+  }
+
   // ─── Real-time Sync ───
 
   function scheduleSync() {
@@ -409,9 +449,19 @@
     if (text === lastSyncedText) return;
     if (!connected || !ws || ws.readyState !== 1) return;
 
-    lastSyncedText = text;
-    ws.send(JSON.stringify({ type: 'sync', text: text }));
-    showSyncHint('已同步 (' + text.length + ' 字)');
+    if (syncMode === 'append') {
+      if (text.length > lastSyncedText.length &&
+          text.substring(0, lastSyncedText.length) === lastSyncedText) {
+        var delta = text.substring(lastSyncedText.length);
+        ws.send(JSON.stringify({ type: 'input', text: delta }));
+        showSyncHint('已追加 (' + delta.length + ' 字)');
+      }
+      lastSyncedText = text;
+    } else {
+      lastSyncedText = text;
+      ws.send(JSON.stringify({ type: 'sync', text: text }));
+      showSyncHint('已同步 (' + text.length + ' 字)');
+    }
   }
 
   function showSyncHint(msg) {
