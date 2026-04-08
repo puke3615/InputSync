@@ -1,6 +1,8 @@
+mod config;
 mod keyboard;
 mod network;
 mod qrcode_gen;
+mod scene;
 mod server;
 
 use once_cell::sync::Lazy;
@@ -58,8 +60,6 @@ fn get_local_ips() -> Vec<String> {
 fn check_accessibility() -> bool {
     #[cfg(target_os = "macos")]
     {
-        // Use AXIsProcessTrusted() to silently check without triggering the system dialog.
-        // Enigo::new() would show the macOS permission popup every time - avoid that.
         extern "C" {
             fn AXIsProcessTrusted() -> bool;
         }
@@ -81,8 +81,79 @@ fn open_accessibility_settings() {
     }
 }
 
+#[tauri::command]
+fn get_scenes() -> Vec<scene::Scene> {
+    scene::get_scenes()
+}
+
+#[tauri::command]
+fn save_scene(new_scene: scene::Scene) -> Vec<scene::Scene> {
+    scene::save_scene(new_scene);
+    let scenes = scene::get_scenes();
+    config::save_scenes(&scenes);
+    server::broadcast_scenes();
+    scenes
+}
+
+#[tauri::command]
+fn delete_scene(id: String) -> Vec<scene::Scene> {
+    let deleted = scene::delete_scene(&id);
+    log::info!("delete_scene id={}, success={}", id, deleted);
+    let scenes = scene::get_scenes();
+    config::save_scenes(&scenes);
+    server::broadcast_scenes();
+    scenes
+}
+
+#[tauri::command]
+fn export_scene_file(id: String) -> Result<String, String> {
+    let scene = scene::find_scene(&id).ok_or_else(|| "场景不存在".to_string())?;
+    let json = serde_json::to_string_pretty(&scene).map_err(|e| e.to_string())?;
+    let safe_name: String = scene
+        .name
+        .chars()
+        .map(|c| if c == '/' || c == '\\' || c == ':' { '_' } else { c })
+        .collect();
+    let filename = format!("InputSync-{}.json", safe_name);
+
+    let path = rfd::FileDialog::new()
+        .set_title("导出场景")
+        .set_file_name(&filename)
+        .add_filter("JSON", &["json"])
+        .save_file();
+
+    match path {
+        Some(p) => {
+            std::fs::write(&p, &json).map_err(|e| e.to_string())?;
+            Ok(p.display().to_string())
+        }
+        None => Err("已取消".to_string()),
+    }
+}
+
+#[tauri::command]
+fn import_scene_data(json: String) -> Result<Vec<scene::Scene>, String> {
+    let mut s: scene::Scene =
+        serde_json::from_str(&json).map_err(|e| format!("解析失败: {}", e))?;
+    s.builtin = false;
+    s.id = format!(
+        "import-{}",
+        &uuid::Uuid::new_v4().to_string()[..8]
+    );
+    scene::save_scene(s);
+    let scenes = scene::get_scenes();
+    config::save_scenes(&scenes);
+    server::broadcast_scenes();
+    Ok(scenes)
+}
+
 pub fn run() {
     env_logger::init();
+
+    // Load config and initialize scenes
+    let app_config = config::load_config();
+    scene::init(app_config.scenes);
+    log::info!("Loaded {} scenes", scene::get_scenes().len());
 
     let port: u16 = 5678;
     let local_ip = network::get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string());
@@ -109,6 +180,11 @@ pub fn run() {
             generate_qr,
             check_accessibility,
             open_accessibility_settings,
+            get_scenes,
+            save_scene,
+            delete_scene,
+            export_scene_file,
+            import_scene_data,
         ])
         .setup(|app| {
             let quit = MenuItemBuilder::with_id("quit", "退出").build(app)?;

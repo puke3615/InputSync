@@ -1,0 +1,38 @@
+{
+  "id": "send-message",
+  "name": "发送消息",
+  "description": "自动发送到当前聊天窗口",
+  "realtime_sync": false,
+  "trigger": {
+    "type": "Silence",
+    "timeout_ms": 500
+  },
+  "actions": [
+    {
+      "type": "KeyPress",
+      "keys": [
+        "Enter"
+      ],
+      "repeat": 1,
+      "repeat_delay_ms": 50
+    },
+    {
+      "type": "TextTransform",
+      "transform": {
+        "type": "StripLeadingPunctuation"
+      }
+    },
+    {
+      "type": "SyncText"
+    },
+    {
+      "type": "KeyPress",
+      "keys": [
+        "Enter"
+      ],
+      "repeat": 1,
+      "repeat_delay_ms": 50
+    }
+  ],
+  "builtin": true
+}

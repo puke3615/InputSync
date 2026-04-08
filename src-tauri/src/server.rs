@@ -4,17 +4,23 @@ use axum::{
     routing::get,
     Router,
 };
-use futures_util::StreamExt;
-use once_cell::sync::OnceCell;
+use futures_util::{SinkExt, StreamExt};
+use once_cell::sync::{Lazy, OnceCell};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use tauri::AppHandle;
 use tauri::Emitter;
+use tokio::sync::broadcast;
 use tower_http::cors::CorsLayer;
 
 use crate::keyboard;
+use crate::scene;
 
 static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 static CLIENT_COUNT: AtomicUsize = AtomicUsize::new(0);
+static SCENE_TX: Lazy<broadcast::Sender<String>> = Lazy::new(|| {
+    let (tx, _) = broadcast::channel(16);
+    tx
+});
 
 pub fn set_app_handle(handle: AppHandle) {
     let _ = APP_HANDLE.set(handle);
@@ -82,7 +88,17 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
     ws.on_upgrade(handle_socket)
 }
 
-async fn handle_socket(mut socket: WebSocket) {
+pub fn broadcast_scenes() {
+    let scenes = scene::get_scenes();
+    let msg = serde_json::json!({
+        "type": "scenes",
+        "scenes": scenes
+    })
+    .to_string();
+    let _ = SCENE_TX.send(msg);
+}
+
+async fn handle_socket(socket: WebSocket) {
     CLIENT_COUNT.fetch_add(1, Ordering::Relaxed);
     emit_client_count();
     log::info!(
@@ -90,7 +106,10 @@ async fn handle_socket(mut socket: WebSocket) {
         CLIENT_COUNT.load(Ordering::Relaxed)
     );
 
-    if let Err(e) = socket
+    let (mut sender, mut receiver) = socket.split();
+
+    // Send welcome message
+    let _ = sender
         .send(Message::Text(
             serde_json::json!({
                 "type": "connected",
@@ -99,22 +118,71 @@ async fn handle_socket(mut socket: WebSocket) {
             .to_string()
             .into(),
         ))
-        .await
-    {
-        log::error!("Failed to send welcome message: {}", e);
-    }
+        .await;
 
-    while let Some(msg) = socket.next().await {
-        match msg {
-            Ok(Message::Text(text)) => {
-                handle_text_message(&text);
+    // Send available scenes
+    let scenes = scene::get_scenes();
+    let _ = sender
+        .send(Message::Text(
+            serde_json::json!({
+                "type": "scenes",
+                "scenes": scenes
+            })
+            .to_string()
+            .into(),
+        ))
+        .await;
+
+    let mut scene_rx = SCENE_TX.subscribe();
+    let mut active_scene_id = String::from("default");
+
+    loop {
+        tokio::select! {
+            msg = receiver.next() => {
+                match msg {
+                    Some(Ok(Message::Text(text))) => {
+                        let parsed: Result<serde_json::Value, _> = serde_json::from_str(&text);
+                        match parsed {
+                            Ok(msg_val) => {
+                                let msg_type = msg_val["type"].as_str().unwrap_or("");
+                                match msg_type {
+                                    "switch_scene" => {
+                                        if let Some(id) = msg_val["scene_id"].as_str() {
+                                            active_scene_id = id.to_string();
+                                            log::info!("Scene switched to: {}", id);
+                                        }
+                                    }
+                                    "trigger_scene" => {
+                                        let sync_text =
+                                            msg_val["text"].as_str().unwrap_or("").to_string();
+                                        let scene_id = active_scene_id.clone();
+                                        std::thread::spawn(move || {
+                                            scene::execute_scene(&scene_id, &sync_text);
+                                        });
+                                    }
+                                    _ => {
+                                        handle_text_message(&msg_val);
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                log::error!("Failed to parse message: {}", e);
+                            }
+                        }
+                    }
+                    Some(Ok(Message::Close(_))) | None => break,
+                    Some(Err(e)) => {
+                        log::error!("WebSocket error: {}", e);
+                        break;
+                    }
+                    _ => {}
+                }
             }
-            Ok(Message::Close(_)) => break,
-            Err(e) => {
-                log::error!("WebSocket error: {}", e);
-                break;
+            Ok(scene_msg) = scene_rx.recv() => {
+                if sender.send(Message::Text(scene_msg.into())).await.is_err() {
+                    break;
+                }
             }
-            _ => {}
         }
     }
 
@@ -126,42 +194,34 @@ async fn handle_socket(mut socket: WebSocket) {
     );
 }
 
-fn handle_text_message(text: &str) {
-    let parsed: Result<serde_json::Value, _> = serde_json::from_str(text);
-    match parsed {
-        Ok(msg) => {
-            let msg_type = msg["type"].as_str().unwrap_or("");
-            match msg_type {
-                "input" => {
-                    if let Some(content) = msg["text"].as_str() {
-                        if !content.is_empty() {
-                            log::info!("Typing: {}", content);
-                            keyboard::type_text(content);
-                        }
-                    }
-                }
-                "enter" => {
-                    log::info!("Pressing enter");
-                    keyboard::press_enter();
-                }
-                "sync" => {
-                    if let Some(content) = msg["text"].as_str() {
-                        log::info!("Sync: {} chars", content.len());
-                        keyboard::replace_all_text(content);
-                    }
-                }
-                "clear" => {
-                    log::info!("Clearing current input");
-                    keyboard::clear_current();
-                }
-                "ping" => {}
-                _ => {
-                    log::warn!("Unknown message type: {}", msg_type);
+fn handle_text_message(msg: &serde_json::Value) {
+    let msg_type = msg["type"].as_str().unwrap_or("");
+    match msg_type {
+        "input" => {
+            if let Some(content) = msg["text"].as_str() {
+                if !content.is_empty() {
+                    log::info!("Typing: {}", content);
+                    keyboard::type_text(content);
                 }
             }
         }
-        Err(e) => {
-            log::error!("Failed to parse message: {}", e);
+        "enter" => {
+            log::info!("Pressing enter");
+            keyboard::press_enter();
+        }
+        "sync" => {
+            if let Some(content) = msg["text"].as_str() {
+                log::info!("Sync: {} chars", content.len());
+                keyboard::replace_all_text(content);
+            }
+        }
+        "clear" => {
+            log::info!("Clearing current input");
+            keyboard::clear_current();
+        }
+        "ping" => {}
+        _ => {
+            log::warn!("Unknown message type: {}", msg_type);
         }
     }
 }

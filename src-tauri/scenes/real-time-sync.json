@@ -1,0 +1,11 @@
+{
+  "id": "real-time-sync",
+  "name": "实时同步",
+  "description": "文字实时同步到电脑，手动按回车发送",
+  "realtime_sync": true,
+  "trigger": {
+    "type": "Manual"
+  },
+  "actions": [],
+  "builtin": true
+}

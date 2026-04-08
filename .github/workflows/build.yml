@@ -8,6 +8,10 @@ on:
       - release
     tags:
       - 'v*'
+    paths-ignore:
+      - 'README.md'
+      - '**/*.md'
+      - '.gitignore'
   pull_request:
     branches:
       - main
@@ -80,7 +84,10 @@ jobs:
           releaseBody: |
             InputSync v__VERSION__
 
-            局域网语音输入同步工具 - 跨平台桌面应用
+            ### 更新日志
+            * 将「忽略标点前缀」从同步文字动作迁移至文本转换，提升动作组合灵活性
+            * 导出场景改为系统文件选择对话框，用户可自由选择保存位置
+            * 精简内置场景为 2 个，并以 JSON 文件形式维护，便于后续扩展
 
             ### 下载说明
             - **macOS (Apple Silicon)**: 下载 `_aarch64.dmg` 文件

@@ -100,6 +100,30 @@
     box-shadow: 0 2px 8px rgba(99,102,241,0.3);
   }
 
+  .scene-bar {
+    flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; padding: 0 2px;
+  }
+  .scene-bar label {
+    font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap;
+  }
+  .scene-select {
+    flex: 1; padding: 7px 28px 7px 10px; font-size: 13px; font-weight: 500;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3c0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; background-size: 12px;
+    cursor: pointer; outline: none;
+  }
+  .scene-select:focus { border-color: var(--primary); }
+  .scene-select option { background: #1e1e3a; color: var(--text); }
+
+  .scene-info {
+    flex-shrink: 0; text-align: center; font-size: 11px; color: var(--text-muted);
+    opacity: 0.6; margin-bottom: 6px; transition: all 0.2s;
+  }
+  .scene-info.active { opacity: 1; color: var(--primary-light); }
+
   .sync-hint {
     flex-shrink: 0; text-align: center; font-size: 11px; color: var(--text-muted);
     opacity: 0.5; margin-bottom: 8px;
@@ -253,6 +277,13 @@
     <button class="mode-btn active" id="modeBtnReplace" data-mode="replace">覆盖模式</button>
     <button class="mode-btn" id="modeBtnAppend" data-mode="append">追加模式</button>
   </div>
+
+  <div class="scene-bar" id="sceneBar" style="display:none;">
+    <label>场景</label>
+    <select class="scene-select" id="sceneSelect"></select>
+  </div>
+  <div id="sceneInfo" class="scene-info" style="display:none;"></div>
+
   <div id="syncHint" class="sync-hint">输入内容将实时同步到电脑</div>
 
   <div class="input-card">
@@ -311,6 +342,7 @@
   var KEY_CONNECTIONS = 'is_connections';
   var KEY_HOME_HINT = 'is_home_hint_dismissed';
   var KEY_MODE = 'is_sync_mode';
+  var KEY_SCENE = 'is_active_scene';
 
   var ws = null;
   var connected = false;
@@ -320,6 +352,12 @@
   var lastSyncedText = '';
   var composing = false;
   var syncMode = load(KEY_MODE) || 'replace';
+
+  // Scene state
+  var scenes = [];
+  var activeScene = null;
+  var silenceTimer = null;
+  var sentTextEnd = 0; // tracks how many chars already sent via trigger_scene
 
   var textInput = document.getElementById('textInput');
   var statusDot = document.getElementById('statusDot');
@@ -338,10 +376,11 @@
   }
 
   function bindEvents() {
-    // Input: real-time sync
     textInput.addEventListener('input', function() {
       charCount.textContent = textInput.value.length;
-      if (!composing) scheduleSync();
+      if (!composing) {
+        scheduleSync();
+      }
     });
 
     textInput.addEventListener('compositionstart', function() {
@@ -354,7 +393,6 @@
       scheduleSync();
     });
 
-    // Enter key = send (keyboard shows "发送" button via enterkeyhint="send")
     textInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !composing) {
         e.preventDefault();
@@ -362,7 +400,6 @@
       }
     });
 
-    // iOS: scroll into view on focus
     textInput.addEventListener('focus', function() {
       requestAnimationFrame(function() {
         setTimeout(function() {
@@ -371,14 +408,15 @@
       });
     });
 
-    // Buttons
     document.getElementById('enterBtn').addEventListener('click', doSendEnter);
 
     document.getElementById('clearBtn').addEventListener('click', function() {
       textInput.value = '';
       charCount.textContent = '0';
       lastSyncedText = '';
-      if (connected && syncMode === 'replace') {
+      sentTextEnd = 0;
+      clearTimeout(silenceTimer);
+      if (connected && syncMode === 'replace' && isRealtimeSync()) {
         ws.send(JSON.stringify({ type: 'sync', text: '' }));
       }
       showSyncHint('已清空');
@@ -387,12 +425,15 @@
     document.getElementById('modeBtnReplace').addEventListener('click', function() { applyMode('replace'); });
     document.getElementById('modeBtnAppend').addEventListener('click', function() { applyMode('append'); });
 
+    document.getElementById('sceneSelect').addEventListener('change', function() {
+      selectScene(this.value);
+    });
+
     document.getElementById('settingsBtn').addEventListener('click', openPanel);
     document.getElementById('panelOverlay').addEventListener('click', closePanel);
     document.getElementById('panelCloseBtn').addEventListener('click', closePanel);
     document.getElementById('dismissHintBtn').addEventListener('click', dismissHomeHint);
 
-    // Viewport resize (virtual keyboard)
     if (window.visualViewport) {
       var lastH = window.visualViewport.height;
       window.visualViewport.addEventListener('resize', function() {
@@ -410,13 +451,11 @@
       });
     }
 
-    // Prevent iOS pull-to-refresh
     document.body.addEventListener('touchmove', function(e) {
       var scrollable = e.target.closest('.text-input, .side-panel');
       if (!scrollable) e.preventDefault();
     }, { passive: false });
 
-    // Reconnect on visibility change
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible' && (!ws || ws.readyState > 1)) {
         reconnectAttempts = 0;
@@ -429,14 +468,30 @@
 
   function doSendEnter() {
     if (!connected) return;
-    // Flush any pending text first
+    clearTimeout(silenceTimer);
     clearTimeout(syncTimer);
-    doSync();
-    // Then send enter
+
+    if (activeScene && activeScene.actions && activeScene.actions.length > 0) {
+      if (isRealtimeSync()) { doSync(); }
+      var textToSend = textInput.value.substring(sentTextEnd);
+      if (!textToSend && !isRealtimeSync()) return;
+      ws.send(JSON.stringify({ type: 'trigger_scene', text: textToSend || textInput.value }));
+      textInput.value = '';
+      charCount.textContent = '0';
+      lastSyncedText = '';
+      sentTextEnd = 0;
+      showSyncHint('已触发: ' + activeScene.name);
+      return;
+    }
+
+    if (isRealtimeSync()) {
+      doSync();
+    }
     ws.send(JSON.stringify({ type: 'enter' }));
     textInput.value = '';
     charCount.textContent = '0';
     lastSyncedText = '';
+    sentTextEnd = 0;
     showSyncHint('已发送');
   }
 
@@ -447,11 +502,132 @@
     save(KEY_MODE, mode);
     document.getElementById('modeBtnReplace').classList.toggle('active', mode === 'replace');
     document.getElementById('modeBtnAppend').classList.toggle('active', mode === 'append');
-    var hint = mode === 'replace'
+    updateSyncHintText();
+    lastSyncedText = textInput.value;
+  }
+
+  function updateSyncHintText() {
+    if (!isRealtimeSync()) {
+      document.getElementById('syncHint').textContent = '文字暂存模式：点击发送后统一同步';
+      return;
+    }
+    var hint = syncMode === 'replace'
       ? '覆盖模式：手机内容全量替换电脑输入框'
       : '追加模式：仅将新增内容追加到电脑光标处';
     document.getElementById('syncHint').textContent = hint;
-    lastSyncedText = textInput.value;
+  }
+
+  // ─── Scenes ───
+
+  function isRealtimeSync() {
+    return !activeScene || activeScene.realtime_sync !== false;
+  }
+
+  function renderSceneSelector() {
+    var sel = document.getElementById('sceneSelect');
+    sel.innerHTML = '';
+    scenes.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      sel.appendChild(opt);
+    });
+    if (scenes.length > 0) {
+      document.getElementById('sceneBar').style.display = '';
+    }
+  }
+
+  function selectScene(sceneId) {
+    activeScene = null;
+    for (var i = 0; i < scenes.length; i++) {
+      if (scenes[i].id === sceneId) {
+        activeScene = scenes[i];
+        break;
+      }
+    }
+    if (!activeScene && scenes.length > 0) {
+      activeScene = scenes[0];
+    }
+    if (!activeScene) return;
+
+    save(KEY_SCENE, activeScene.id);
+    document.getElementById('sceneSelect').value = activeScene.id;
+
+    if (connected && ws && ws.readyState === 1) {
+      ws.send(JSON.stringify({ type: 'switch_scene', scene_id: activeScene.id }));
+    }
+
+    updateSceneInfo();
+    updateSyncHintText();
+    sentTextEnd = 0;
+    clearTimeout(silenceTimer);
+  }
+
+  function updateSceneInfo() {
+    var el = document.getElementById('sceneInfo');
+    if (!activeScene || activeScene.id === 'default') {
+      el.style.display = 'none';
+      updateEnterButton();
+      return;
+    }
+
+    var info = activeScene.description || '';
+    if (activeScene.trigger && activeScene.trigger.type === 'Silence') {
+      var sec = (activeScene.trigger.timeout_ms / 1000).toFixed(1).replace(/\.0$/, '');
+      info = '静默 ' + sec + ' 秒后自动触发';
+      if (!activeScene.realtime_sync) {
+        info += ' · 文字暂存模式';
+      }
+    }
+
+    if (info) {
+      el.textContent = info;
+      el.style.display = '';
+      el.classList.toggle('active', activeScene.trigger && activeScene.trigger.type === 'Silence');
+    } else {
+      el.style.display = 'none';
+    }
+
+    updateEnterButton();
+  }
+
+  function updateEnterButton() {
+    var btn = document.getElementById('enterBtn');
+    if (activeScene && activeScene.actions && activeScene.actions.length > 0) {
+      btn.textContent = '▶ 发送';
+    } else {
+      btn.innerHTML = '↵ 回车';
+    }
+  }
+
+  function resetSilenceTimer() {
+    clearTimeout(silenceTimer);
+    if (!activeScene || !activeScene.trigger || activeScene.trigger.type !== 'Silence') return;
+    if (!connected || !textInput.value) return;
+    if (textInput.value.length <= sentTextEnd) return;
+
+    silenceTimer = setTimeout(onSilenceTimeout, activeScene.trigger.timeout_ms);
+  }
+
+  function onSilenceTimeout() {
+    if (!connected || !ws || ws.readyState !== 1) return;
+    if (!activeScene || !activeScene.trigger || activeScene.trigger.type !== 'Silence') return;
+    if (!textInput.value) return;
+
+    // Flush pending real-time sync
+    if (isRealtimeSync()) {
+      clearTimeout(syncTimer);
+      doSync();
+    }
+
+    var textToSend = textInput.value.substring(sentTextEnd);
+    if (!textToSend) return;
+
+    ws.send(JSON.stringify({ type: 'trigger_scene', text: textToSend }));
+    sentTextEnd = textInput.value.length;
+
+    showSyncHint('已触发: ' + activeScene.name);
+    toast('已自动发送');
   }
 
   // ─── Real-time Sync ───
@@ -459,12 +635,19 @@
   function scheduleSync() {
     clearTimeout(syncTimer);
     syncTimer = setTimeout(doSync, 250);
+    resetSilenceTimer();
   }
 
   function doSync() {
     var text = textInput.value;
     if (text === lastSyncedText) return;
     if (!connected || !ws || ws.readyState !== 1) return;
+
+    // Skip real-time sync when scene disables it
+    if (!isRealtimeSync()) {
+      lastSyncedText = text;
+      return;
+    }
 
     if (syncMode === 'append') {
       if (text.length > lastSyncedText.length &&
@@ -516,10 +699,24 @@
       statusText.textContent = '已连接';
       toast('已连接到电脑');
       updateConnectionStatus(true);
+
+      // Re-send active scene after reconnect
+      var savedId = load(KEY_SCENE) || 'default';
+      if (activeScene && ws.readyState === 1) {
+        ws.send(JSON.stringify({ type: 'switch_scene', scene_id: activeScene.id }));
+      }
     };
 
     ws.onmessage = function(ev) {
-      try { JSON.parse(ev.data); } catch(e) {}
+      try {
+        var data = JSON.parse(ev.data);
+        if (data.type === 'scenes') {
+          scenes = data.scenes || [];
+          renderSceneSelector();
+          var savedId = load(KEY_SCENE) || 'default';
+          selectScene(savedId);
+        }
+      } catch(e) {}
     };
 
     ws.onclose = function() {
@@ -527,6 +724,7 @@
       statusDot.classList.remove('connected');
       statusText.textContent = '连接断开';
       updateConnectionStatus(false);
+      clearTimeout(silenceTimer);
       scheduleReconnect();
     };
 
