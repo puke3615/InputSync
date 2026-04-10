@@ -68,14 +68,14 @@ pub fn load_config() -> AppConfig {
     }
 }
 
-/// Ensure all built-in scenes exist in the config, adding any missing ones.
+/// Always replace stored builtin scenes with the latest code-defined versions.
 fn merge_builtin_scenes(config: &mut AppConfig) {
     let defaults = crate::scene::default_scenes();
-    for default in defaults {
-        if !config.scenes.iter().any(|s| s.id == default.id) {
-            config.scenes.push(default);
-        }
-    }
+    let builtin_ids: Vec<String> = defaults.iter().map(|s| s.id.clone()).collect();
+    config.scenes.retain(|s| !builtin_ids.contains(&s.id));
+    let mut all = defaults;
+    all.append(&mut config.scenes);
+    config.scenes = all;
 }
 
 pub fn save_config(config: &AppConfig) {
@@ -86,7 +86,9 @@ pub fn save_config(config: &AppConfig) {
     }
 
     let path = config_path();
-    match serde_json::to_string_pretty(config) {
+    let mut save_cfg = config.clone();
+    save_cfg.scenes.retain(|s| !s.builtin);
+    match serde_json::to_string_pretty(&save_cfg) {
         Ok(json) => {
             if let Err(e) = std::fs::write(&path, json) {
                 log::error!("Failed to write config to {}: {}", path.display(), e);

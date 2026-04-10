@@ -114,20 +114,18 @@ jobs:
             > Global voice input for vibe coding.
 
             ### What's New
-            * Renamed project (InputSync → TalkType), full i18n support (CN→EN UI)
-            * Refreshed app icons across all platforms
-            * Added "Open Config Directory" feature
-            * Major README rewrite; added Chinese README (README_CN.md)
-            * CI build workflow optimizations (path-based trigger filters)
-            * Desktop & mobile UX improvements
+            * Scene management overhaul: built-in scenes are now code-embedded (read-only), with duplicate, unique name validation, and import-overwrite confirmation
+            * Built-in scene names & descriptions are now localized (EN/CN)
+            * Settings icon changed to gear; reduced redundant "TalkType" headings
+            * Footer shows version + open-source link; "Check for Updates" moved to Settings
+            * Debug logs unified to English for developer consistency
 
             ### 更新内容
-            * 项目重命名（InputSync → TalkType），全面国际化支持（中文 → 英文 UI）
-            * 全平台应用图标优化
-            * 新增「打开配置目录」功能
-            * README 全面重写，新增中文版 README_CN.md
-            * CI 构建流程优化（基于路径的触发过滤）
-            * 桌面端 & 手机端体验优化
+            * 场景管理重构：内置场景代码内置且只读，支持复制、名称唯一校验、导入覆盖确认
+            * 内置场景名称和描述支持中英文国际化
+            * 设置图标改为齿轮样式，减少重复的「TalkType」标题
+            * 页脚显示版本号与开源链接，「检查更新」移至设置页
+            * 调试日志统一为英文，方便开发者排查
 
             ### Download
             | Platform | File |

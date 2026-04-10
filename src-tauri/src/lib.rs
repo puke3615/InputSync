@@ -109,17 +109,29 @@ fn open_config_dir() -> Result<(), String> {
 }
 
 #[tauri::command]
+fn get_app_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
+#[tauri::command]
 fn get_scenes() -> Vec<scene::Scene> {
     scene::get_scenes()
 }
 
 #[tauri::command]
-fn save_scene(new_scene: scene::Scene) -> Vec<scene::Scene> {
-    scene::save_scene(new_scene);
+fn save_scene(new_scene: scene::Scene) -> Result<Vec<scene::Scene>, String> {
+    if let Some(existing) = scene::find_scene(&new_scene.id) {
+        if existing.builtin {
+            return Err("Cannot modify built-in scene".to_string());
+        }
+    }
+    let mut s = new_scene;
+    s.builtin = false;
+    scene::save_scene(s);
     let scenes = scene::get_scenes();
     config::save_scenes(&scenes);
     server::broadcast_scenes();
-    scenes
+    Ok(scenes)
 }
 
 #[tauri::command]
@@ -159,14 +171,23 @@ fn export_scene_file(id: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn import_scene_data(json: String) -> Result<Vec<scene::Scene>, String> {
+fn import_scene_data(json: String, overwrite_id: Option<String>) -> Result<Vec<scene::Scene>, String> {
     let mut s: scene::Scene =
         serde_json::from_str(&json).map_err(|e| format!("Parse failed: {}", e))?;
     s.builtin = false;
-    s.id = format!(
-        "import-{}",
-        &uuid::Uuid::new_v4().to_string()[..8]
-    );
+    if let Some(oid) = overwrite_id {
+        if let Some(existing) = scene::find_scene(&oid) {
+            if existing.builtin {
+                return Err("Cannot overwrite built-in scene".to_string());
+            }
+        }
+        s.id = oid;
+    } else {
+        s.id = format!(
+            "import-{}",
+            &uuid::Uuid::new_v4().to_string()[..8]
+        );
+    }
     scene::save_scene(s);
     let scenes = scene::get_scenes();
     config::save_scenes(&scenes);
@@ -208,6 +229,7 @@ pub fn run() {
             check_accessibility,
             open_accessibility_settings,
             open_config_dir,
+            get_app_version,
             get_scenes,
             save_scene,
             delete_scene,

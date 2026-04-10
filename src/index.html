@@ -70,8 +70,7 @@
   .lang-btn:hover { background: var(--primary); color: #fff; }
 
   .home-center { text-align: center; }
-  .home-center h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
-  .subtitle { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 16px; font-weight: 500; }
   .qr-box {
     display: inline-block; background: #fff; border: 1px solid var(--border);
     border-radius: 14px; padding: 14px; margin-bottom: 14px;
@@ -296,6 +295,15 @@
   .btn-export-scene { color: var(--text2); }
   .btn-export-scene:hover { background: var(--primary-bg); border-color: var(--primary); color: var(--primary); }
   #importFileInput { display: none; }
+  .footer a { color: var(--primary); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+  .ed-form.readonly-mode input,
+  .ed-form.readonly-mode select,
+  .ed-form.readonly-mode textarea,
+  .ed-form.readonly-mode .check-row { pointer-events: none; opacity: 0.6; }
+  .ed-form.readonly-mode .btn-add-action { display: none; }
+  .ed-form.readonly-mode .action-btns { display: none; }
+  .ed-form.readonly-mode .action-type-sel { pointer-events: none; }
 </style>
 </head>
 <body>
@@ -313,7 +321,7 @@
     <div class="top-bar-right">
       <button type="button" class="lang-btn" id="langBtnHome" data-lang-toggle>EN</button>
       <button class="top-bar-btn" id="goSettingsBtn" data-i18n="settings" data-i18n-attr="title" title="">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
   </div>
@@ -322,7 +330,6 @@
   <div class="page-scroll">
     <div class="page-inner" id="content" style="display:none;">
       <div class="home-center">
-        <h2 data-i18n="appName">TalkType</h2>
         <p class="subtitle" data-i18n="subtitle"></p>
         <div class="qr-box"><img id="qrImg" alt="" /></div>
         <div class="qr-tip" data-i18n="qrTip"></div>
@@ -347,7 +354,7 @@
       <p class="hint" data-i18n="hint"></p>
     </div>
   </div>
-  <div class="footer" data-i18n="footer"></div>
+  <div class="footer" id="appFooter"></div>
 </div>
 
 <!-- ═══ PAGE: SETTINGS ═══ -->
@@ -375,6 +382,7 @@
       <div class="settings-section">
         <div class="settings-section-title" data-i18n="generalSettings"></div>
         <button class="btn-import-scene" id="openConfigDirBtn" data-i18n="openConfigDir" style="width:100%;"></button>
+        <button class="btn-import-scene" id="checkUpdatesBtn" data-i18n="checkUpdates" style="width:100%;margin-top:6px;"></button>
       </div>
     </div>
   </div>
@@ -431,6 +439,7 @@
           <button class="btn-save" id="saveEditBtn" data-i18n="save"></button>
         </div>
         <div class="ed-bottom-btns" id="edBottomBtns" style="display:none;">
+          <button class="btn-export-scene" id="edDuplicateBtn" data-i18n="duplicateScene"></button>
           <button class="btn-export-scene" id="edExportBtn" data-i18n="exportBtn"></button>
           <button class="btn-delete-scene" id="edDeleteBtn"></button>
         </div>
@@ -560,7 +569,18 @@
       actionDel: 'Remove',
       waitWindowAppPh: 'App name',
       generalSettings: 'GENERAL',
-      openConfigDir: '📂 Open Config Directory'
+      openConfigDir: '📂 Open Config Directory',
+      duplicateScene: 'Duplicate',
+      viewScene: 'View Scene',
+      nameExists: 'A scene with this name already exists. Please use a different name.',
+      nameExistsHint: 'Tip: add a number or descriptor to make it unique, e.g. "{name} (2)"',
+      importConflict: 'A scene with the same name or ID already exists: "{name}". Overwrite it?',
+      cannotOverwriteBuiltin: 'Cannot overwrite built-in scene "{name}".',
+      footerOpenSource: 'Open source on GitHub',
+      checkUpdates: '🔄 Check for Updates',
+      readonlyHint: 'Built-in scenes are read-only. Use Duplicate to create an editable copy.',
+      builtinRTSyncName: 'Real-time Sync',
+      builtinRTSyncDesc: 'Text syncs to computer in real time, press Enter to send manually'
     },
     zh: {
       appName: 'TalkType',
@@ -680,7 +700,18 @@
       actionDel: '删除',
       waitWindowAppPh: '应用名称',
       generalSettings: '通用设置',
-      openConfigDir: '📂 打开配置目录'
+      openConfigDir: '📂 打开配置目录',
+      duplicateScene: '复制',
+      viewScene: '查看场景',
+      nameExists: '已存在同名场景，请使用不同的名称。',
+      nameExistsHint: '提示：可以加数字或描述区分，例如「{name}（2）」',
+      importConflict: '已存在同名或同ID的场景「{name}」，是否覆盖？',
+      cannotOverwriteBuiltin: '无法覆盖内置场景「{name}」。',
+      footerOpenSource: '在 GitHub 上开源',
+      checkUpdates: '🔄 检查更新',
+      readonlyHint: '内置场景为只读。点击「复制」可创建可编辑的副本。',
+      builtinRTSyncName: '实时同步',
+      builtinRTSyncDesc: '文字实时同步到电脑，按回车手动发送'
     }
   };
 
@@ -711,6 +742,15 @@
     else l.textContent = t('statusWaiting');
   }
 
+  function updateFooter() {
+    var el = document.getElementById('appFooter');
+    if (!el) return;
+    var vText = appVersion ? ('v' + appVersion) : '';
+    el.innerHTML = (vText ? vText + ' · ' : '') +
+      '<a href="https://github.com/puke3615/TalkType" target="_blank" rel="noopener">' +
+      esc(t('footerOpenSource')) + '</a>';
+  }
+
   function applyI18n() {
     document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-CN' : 'en');
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -725,6 +765,7 @@
     });
     updateLangToggleButtons();
     updateStatusLabel();
+    updateFooter();
   }
 
   function switchLang(lang) {
@@ -742,13 +783,9 @@
   }
 
   function refreshEditorTitle() {
-    var scene = null;
-    if (editingId) {
-      for (var i = 0; i < allScenes.length; i++) {
-        if (allScenes[i].id === editingId) { scene = allScenes[i]; break; }
-      }
-    }
-    document.getElementById('edPageTitle').textContent = scene ? t('editScene') : t('newScene');
+    if (editorMode === 'view') document.getElementById('edPageTitle').textContent = t('viewScene');
+    else if (editorMode === 'edit') document.getElementById('edPageTitle').textContent = t('editScene');
+    else document.getElementById('edPageTitle').textContent = t('newScene');
   }
 
   document.querySelectorAll('[data-lang-toggle]').forEach(function(btn) {
@@ -781,7 +818,8 @@
   }
 
   var logs=[], debugVisible=false, invoke=null, listen=null, serverUrl='', serverPort=5678;
-  var allScenes=[], editingId=null, editActions=[];
+  var allScenes=[], editingId=null, editActions=[], editorMode='new';
+  var appVersion='';
   var isMac = navigator.platform.indexOf('Mac') !== -1;
 
   function showPage(id) {
@@ -808,15 +846,15 @@
   function showError(m){document.getElementById('loaderMsg').textContent=m;document.getElementById('spinner').style.display='none';}
 
   async function init(){
-    log(t('logAppStart')); showLoader(t('loaderStarting'));
+    log('App starting...'); showLoader(t('loaderStarting'));
     var hasTauri=false;
     try{
       if(window.__TAURI__&&window.__TAURI__.core&&window.__TAURI__.core.invoke){
         invoke=window.__TAURI__.core.invoke;
         listen=window.__TAURI__.event?window.__TAURI__.event.listen:null;
-        hasTauri=true; log(t('logTauriOk'));
-      } else { log(t('logHttpFallback')); }
-    }catch(e){log(t('logTauriErr')+e.message);}
+        hasTauri=true; log('Tauri API available');
+      } else { log('Using HTTP fallback'); }
+    }catch(e){log('Tauri detection error: '+e.message);}
 
     showLoader(t('loaderFetching'));
     var info=null;
@@ -838,6 +876,8 @@
     var sel=document.getElementById('ipSel'); sel.innerHTML='';
     ips.forEach(function(ip){var o=document.createElement('option');o.value=ip;o.textContent=ip;if(ip===info.ip)o.selected=true;sel.appendChild(o);});
     if(ips.length>1)document.getElementById('ipBar').style.display='';
+
+    if(invoke){try{appVersion=await invoke('get_app_version');}catch(e){}}
     applyI18n();
     hideLoader();
 
@@ -871,13 +911,31 @@
   document.getElementById('openConfigDirBtn').addEventListener('click',function(){
     if(invoke) invoke('open_config_dir').catch(function(e){ log('Open config dir failed: '+e); });
   });
+  document.getElementById('checkUpdatesBtn').addEventListener('click',function(){
+    var a=document.createElement('a');
+    a.href='https://github.com/puke3615/TalkType/releases';
+    a.target='_blank'; a.rel='noopener'; a.click();
+  });
+
+  // ─── Builtin scene i18n ───
+  var BUILTIN_I18N = {
+    'real-time-sync': { name: 'builtinRTSyncName', desc: 'builtinRTSyncDesc' }
+  };
+  function sceneDisplayName(scene) {
+    if (scene.builtin && BUILTIN_I18N[scene.id]) return t(BUILTIN_I18N[scene.id].name);
+    return scene.name;
+  }
+  function sceneDisplayDesc(scene) {
+    if (scene.builtin && BUILTIN_I18N[scene.id]) return t(BUILTIN_I18N[scene.id].desc);
+    return scene.description || '';
+  }
 
   // ─── Scene List ───
   document.getElementById('addSceneBtn').addEventListener('click',function(){openEditor(null);});
 
   async function loadScenes(){
-    try{allScenes=await invoke('get_scenes');renderSceneList();log(t('logLoadedScenes',{count:allScenes.length}));}
-    catch(e){log(t('logLoadFailed')+e);}
+    try{allScenes=await invoke('get_scenes');renderSceneList();log('Loaded '+allScenes.length+' scene(s)');}
+    catch(e){log('Failed to load scenes: '+e);}
   }
 
   function renderSceneList(){
@@ -886,11 +944,13 @@
       var div=document.createElement('div'); div.className='scene-item';
       var trig=(scene.trigger&&scene.trigger.type==='Silence')?t('silenceMs',{ms:scene.trigger.timeout_ms}):t('manual');
       var acts=scene.actions.length>0?t('actionsCount',{count:scene.actions.length}):t('noActions');
+      var displayName=sceneDisplayName(scene);
+      var displayDesc=sceneDisplayDesc(scene);
       div.innerHTML=
         '<div class="scene-item-icon">'+sceneIcon(scene)+'</div>'+
         '<div class="scene-item-info">'+
-          '<div class="scene-item-name">'+esc(scene.name)+'</div>'+
-          '<div class="scene-item-desc">'+esc(scene.description||trig+' · '+acts)+'</div>'+
+          '<div class="scene-item-name">'+esc(displayName)+'</div>'+
+          '<div class="scene-item-desc">'+esc(displayDesc||trig+' · '+acts)+'</div>'+
         '</div>'+
         (scene.builtin?'<span class="scene-item-tag">'+esc(t('builtin'))+'</span>':'')+
         '<span class="scene-item-arrow">›</span>';
@@ -912,9 +972,27 @@
     var reader=new FileReader();
     reader.onload=async function(){
       try{
-        allScenes=await invoke('import_scene_data',{json:reader.result});
-        renderSceneList(); log(t('importSuccess'));
-      }catch(e){log(t('importFailed')+e); alert(t('importFailed')+e);}
+        var jsonStr=reader.result;
+        var parsed;
+        try{parsed=JSON.parse(jsonStr);}catch(pe){alert(t('importFailed')+pe.message);return;}
+        var conflictById=null, conflictByName=null;
+        for(var i=0;i<allScenes.length;i++){
+          if(allScenes[i].id===parsed.id) conflictById=allScenes[i];
+          if(allScenes[i].name===parsed.name) conflictByName=allScenes[i];
+        }
+        var conflict=conflictById||conflictByName;
+        if(conflict){
+          if(conflict.builtin){
+            alert(t('cannotOverwriteBuiltin',{name:conflict.name}));
+            return;
+          }
+          if(!confirm(t('importConflict',{name:conflict.name}))){return;}
+          allScenes=await invoke('import_scene_data',{json:jsonStr,overwriteId:conflict.id});
+        } else {
+          allScenes=await invoke('import_scene_data',{json:jsonStr});
+        }
+        renderSceneList(); log('Scene imported');
+      }catch(e){log('Import failed: '+e); alert(t('importFailed')+e);}
     };
     reader.readAsText(file);
     this.value='';
@@ -923,12 +1001,20 @@
     if(!editingId||!invoke)return;
     try{
       var path=await invoke('export_scene_file',{id:editingId});
-      log(t('exportedTo')+path);
+      log('Exported to: '+path);
       alert(t('exportedTo')+'\n'+path);
     }catch(e){
       var es=String(e);
-      if(es.indexOf('已取消')===-1&&es.toLowerCase().indexOf('cancel')===-1) log(t('exportFailed')+e);
+      if(es.indexOf('cancel')===-1&&es.indexOf('Cancel')===-1) log('Export failed: '+e);
     }
+  });
+  document.getElementById('edDuplicateBtn').addEventListener('click',function(){
+    if(!editingId)return;
+    var scene=null;
+    for(var i=0;i<allScenes.length;i++){
+      if(allScenes[i].id===editingId){scene=allScenes[i];break;}
+    }
+    if(scene) openEditor(scene, true);
   });
 
   // ─── Editor Page ───
@@ -951,18 +1037,31 @@
       clearTimeout(btn._confirmTimer);
       btn._confirming=false;
       try{allScenes=await invoke('delete_scene',{id:editingId});renderSceneList();showPage('pageSettings');}
-      catch(e){log(t('deleteFailed')+e);}
+      catch(e){log('Delete failed: '+e);}
       btn.textContent=t('deleteScene');
     } else {
       btn._confirming=true;
     }
   });
 
-  function openEditor(scene){
-    editingId=scene?scene.id:null;
-    document.getElementById('edPageTitle').textContent=scene?t('editScene'):t('newScene');
-    document.getElementById('edName').value=scene?scene.name:'';
-    document.getElementById('edDesc').value=scene?(scene.description||''):'';
+  function openEditor(scene, isDuplicate){
+    var isBuiltin = scene && scene.builtin && !isDuplicate;
+
+    var displayName = scene ? sceneDisplayName(scene) : '';
+    var displayDesc = scene ? sceneDisplayDesc(scene) : '';
+
+    if (isDuplicate) {
+      editingId = null;
+      editorMode = 'new';
+      document.getElementById('edName').value = displayName + ' (' + t('duplicateScene') + ')';
+    } else {
+      editingId = scene ? scene.id : null;
+      editorMode = !scene ? 'new' : (isBuiltin ? 'view' : 'edit');
+      document.getElementById('edName').value = displayName;
+    }
+
+    refreshEditorTitle();
+    document.getElementById('edDesc').value=displayDesc;
     var tt=(scene&&scene.trigger)?scene.trigger.type:'Manual';
     document.getElementById('edTriggerType').value=tt;
     var isSil=tt==='Silence';
@@ -972,17 +1071,30 @@
     document.getElementById('edRealtimeSync').checked=scene?(scene.realtime_sync!==false):true;
     editActions=scene?JSON.parse(JSON.stringify(scene.actions||[])):[];
 
+    var form=document.querySelector('.ed-form');
+    form.classList.toggle('readonly-mode', isBuiltin);
+    document.getElementById('saveEditBtn').style.display = isBuiltin ? 'none' : '';
+    var cancelBtn = document.getElementById('cancelEditBtn');
+    cancelBtn.setAttribute('data-i18n', isBuiltin ? 'backTitle' : 'cancel');
+    cancelBtn.textContent = isBuiltin ? t('backTitle') : t('cancel');
+
     var bb=document.getElementById('edBottomBtns');
     var delBtn=document.getElementById('edDeleteBtn');
+    var dupBtn=document.getElementById('edDuplicateBtn');
     delBtn.textContent=t('deleteScene'); delBtn._confirming=false;
-    if(scene&&!scene.builtin){
+
+    if (!scene || isDuplicate) {
+      bb.style.display='none';
+    } else if (scene.builtin) {
       bb.style.display='';
-      delBtn.style.display='';
-    } else if(scene&&scene.builtin){
-      bb.style.display='';
+      dupBtn.style.display='';
+      document.getElementById('edExportBtn').style.display='';
       delBtn.style.display='none';
     } else {
-      bb.style.display='none';
+      bb.style.display='';
+      dupBtn.style.display='';
+      document.getElementById('edExportBtn').style.display='';
+      delBtn.style.display='';
     }
 
     renderActionList();
@@ -992,6 +1104,16 @@
   async function saveScene(){
     var name=document.getElementById('edName').value.trim();
     if(!name){document.getElementById('edName').focus();return;}
+
+    var duplicate = allScenes.find(function(s){
+      return s.name === name && s.id !== (editingId || '');
+    });
+    if(duplicate){
+      alert(t('nameExists') + '\n' + t('nameExistsHint', {name: name}));
+      document.getElementById('edName').focus();
+      return;
+    }
+
     var tt=document.getElementById('edTriggerType').value;
     var trigger=tt==='Silence'
       ?{type:'Silence',timeout_ms:parseInt(document.getElementById('edTimeout').value)||2000}
@@ -1019,8 +1141,8 @@
       allScenes=await invoke('save_scene',{newScene:obj});
       renderSceneList();
       showPage('pageSettings');
-      log(t('sceneSaved')+name);
-    }catch(e){log(t('saveFailed')+e);}
+      log('Scene saved: '+name);
+    }catch(e){log('Save failed: '+e); alert(String(e));}
   }
 
   // ─── Action List Rendering ───
