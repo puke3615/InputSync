@@ -1,207 +1,269 @@
-# 📱 InputSync
+<p align="center">
+  <img src="src-tauri/icons/128x128.png" width="80" alt="TalkType" />
+</p>
 
-> **手机变键盘** —— 用手机语音输入，实时同步到电脑。
+<h1 align="center">TalkType</h1>
 
 <p align="center">
-  <strong>🔒 完全局域网通信 · 无需云服务 · 隐私零泄露</strong>
+  <b>Stop typing prompts. Just speak.</b><br>
+  Your phone's voice input → instant text at your computer's cursor → in any app.<br>
+  <i>Global voice input for vibe coding.</i>
+</p>
+
+<p align="center">
+  <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/puke3615/TalkType?style=flat-square&color=6366f1" alt="Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License" /></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square" alt="Platform" />
+  <img src="https://img.shields.io/badge/i18n-English%20%7C%20%E4%B8%AD%E6%96%87-green?style=flat-square" alt="i18n" />
+</p>
+
+<p align="center">
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-why-talktype">Comparison</a> •
+  <a href="#-download">Download</a> •
+  <a href="README_CN.md">中文文档</a>
 </p>
 
 ---
 
-## ✨ 这是什么？
+## ⚡ 3x Faster Than Typing
 
-InputSync 是一款跨平台桌面工具，让你可以 **用手机的语音输入法** 将文字实时同步到电脑的任意输入框中。
+> Why type when you can talk?
 
-适用场景：
+| | Typing | Speaking with TalkType |
+|---|:---:|:---:|
+| **Speed** | ~40 WPM | **~150 WPM** |
+| **200-word prompt** | ~5 minutes | **~1.3 minutes** |
+| **Hands** | Both occupied | Free to browse code |
+| **Fatigue** | RSI risk | Relaxed |
 
-- 🎤 **语音输入长文本** —— 在电脑上写文档 / 回消息时，不用打字，拿起手机说话就行
-- 🌐 **跨设备输入** —— 手机输入法更顺手？直接用它给电脑打字
-- 🔐 **隐私敏感场景** —— 所有数据只在局域网内传输，绝不经过任何外部服务器
+**Speaking is 3.75x faster than typing.** A complex 200-word prompt that takes 5 minutes to type? Speak it in under 80 seconds.
 
-## 🚀 核心特性
+## Demo
 
-| 特性 | 说明 |
-|------|------|
-| 📡 **实时同步** | 手机端输入的文字实时出现在电脑光标处，无需手动发送 |
-| 📷 **扫码即连** | 电脑显示二维码，手机扫一下就连上 |
-| 🔄 **智能重连** | 同一 WiFi 下保存连接记录，下次打开浏览器直接连，无需重新扫码 |
-| 🌍 **三平台支持** | 支持 macOS / Windows / Linux |
-| 🔒 **纯局域网** | 数据只在你的 WiFi 内传输，不经过任何云服务 |
-| 📱 **手机免安装** | 手机端是网页，不需要装任何 App |
+<!-- TODO: Replace with actual GIF -->
 
-## 📦 下载安装
+> 📹 _GIF coming soon — showing: open app → scan QR → speak on phone → text appears in Cursor_
+>
+> **Help wanted:** If you use TalkType, record a short demo and submit a PR!
 
-前往 [**Releases**](../../releases) 页面下载对应系统的安装包：
+## 🚀 Quick Start
 
-| 系统 | 下载文件 | 说明 |
-|------|---------|------|
-| 🍎 **macOS (Apple Silicon)** | `InputSync_x.x.x_aarch64.dmg` | M1 / M2 / M3 / M4 芯片的 Mac |
-| 🍎 **macOS (Intel)** | `InputSync_x.x.x_x64.dmg` | 老款 Intel 芯片的 Mac |
-| 🪟 **Windows** | `InputSync_x.x.x_x64-setup.exe` | 64 位 Windows 10/11 |
-| 🐧 **Linux** | `InputSync_x.x.x_amd64.deb` / `.AppImage` | Ubuntu / Debian 或通用 Linux |
+**Get started in 30 seconds:**
 
-> 💡 **不知道自己 Mac 是哪种芯片？** 点左上角  → 关于本机 → 看「芯片」一栏。显示 "Apple M1/M2/..." 就下载 `aarch64`，显示 "Intel" 就下载 `x64`。
+1. **Download** → [Latest Release](../../releases/latest) (macOS / Windows / Linux)
+2. **Open TalkType** on your computer → QR code appears
+3. **Scan** the QR code with your phone → web page opens (no app install)
+4. **Speak** → text appears at your cursor ✨
 
-## 🎯 使用方法
+> ⚠️ Phone and computer must be on the **same WiFi**.
 
-### 第一步：启动应用
+### Pro Tips
 
-双击打开 InputSync，等待几秒钟，应用窗口会显示一个 **二维码** 和连接地址。
+- 📌 **Add to Home Screen** — on your phone's browser, "Add to Home Screen" for instant access (no rescan needed next time)
+- 🌍 **Bilingual UI** — switch between English and Chinese in the app settings
 
-### 第二步：手机扫码连接
+## ✨ Features
 
-拿起手机，打开 **相机** 或任意扫码工具，扫描电脑上的二维码。
+- 🎙️ **Phone-native voice input** — uses your phone's built-in STT, no model download needed
+- ⌨️ **Global text injection** — text appears at your cursor in ANY app
+- 📱 **Zero install on phone** — phone client is a web page, no app needed
+- 🔒 **100% local network** — all data stays on your WiFi, zero cloud dependency
+- 📷 **QR code pairing** — scan and connect in seconds
+- 🔄 **Real-time sync** — see text as you speak, character by character
+- 🔁 **Auto reconnect** — remembers connections, auto-reconnects on same WiFi
+- ⚡ **Scene automation** — create workflows with triggers and action sequences
+- 🌍 **i18n** — English and Chinese UI, auto-detects your language
+- 🌍 **Cross-platform** — macOS, Windows, Linux
+- 📲 **PWA support** — add to phone home screen for app-like experience
 
-> ⚠️ **重要**：手机和电脑必须连接 **同一个 WiFi** 网络！
+## 🎯 Why TalkType?
 
-扫码后手机浏览器会自动打开 InputSync 的输入页面，顶部显示 **"已连接"** 即表示连接成功 🟢。
+### The Unfair Advantage
 
-### 第三步：开始输入
+Other voice input tools run Whisper locally (1–3 GB model download, CPU/GPU intensive) or use cloud APIs (latency, cost, privacy risk).
 
-在手机页面的输入框中 **打字或使用语音输入**，文字会 **实时同步** 到电脑当前光标所在的位置（比如你正在编辑的文档、聊天窗口、搜索框等）。
+TalkType takes a fundamentally different approach: **your phone IS the voice engine.** Apple's, Google's, and Samsung's STT are trained on billions of data points, support 100+ languages, and are already on your device. TalkType simply bridges that to your computer over local WiFi.
 
-- 输入文字 → 自动同步到电脑
-- 点「↵ 回车」→ 在电脑端按下回车键
-- 点「清空」→ 清空手机和电脑端的输入内容
+**Zero config. Zero cost. Zero compromise on privacy.**
 
-### 🔁 下次使用（免扫码）
+### vs. Other Voice Input Tools
 
-InputSync 会自动保存连接记录。下次只要在 **同一个 WiFi** 下：
+| | **TalkType** | SuperWhisper | Wispr Flow | VoiceTypr | MacWhisper |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **Price** | **Free** | $9/mo | $15/mo | Free | Freemium |
+| **Open Source** | ✅ | ❌ | ❌ | ✅ | ❌ |
+| **Voice Engine** | Phone native | Local Whisper | Cloud AI | Local Whisper | Local Whisper |
+| **Model Download** | **None** | 1–3 GB | N/A | 1–3 GB | 1–3 GB |
+| **Setup Time** | **30 sec** | 5–10 min | 5 min | 5–10 min | 5 min |
+| **Languages** | **100+ native** | ~50 | ~30 | ~50 | ~50 |
+| **macOS** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Windows** | ✅ | ❌ | ❌ | ✅ | ❌ |
+| **Linux** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Privacy** | **LAN only** | Local | ☁️ Cloud | Local | Local |
 
-1. 电脑上打开 InputSync
-2. 手机浏览器打开 **上次的页面**（历史记录 / 书签）即可直接连接
+## 💡 Use Cases
 
-> 💡 **更快捷的方式**：在手机浏览器中把页面「**添加到主屏幕**」，以后像打开 App 一样一键打开！
+| Scenario | Description |
+|---|---|
+| 🧑‍💻 **Vibe Coding** | Speak prompts to Cursor, Copilot, Windsurf, or any AI coding tool |
+| 🤖 **AI Chat** | Dictate to ChatGPT, Claude, Gemini — 3x faster than typing |
+| 📝 **Writing** | Draft emails, docs, and notes hands-free |
+| 💬 **Messaging** | Reply in Slack, Discord, WeChat, Teams by voice |
+| 🔍 **Search** | Voice search in any app or browser |
 
-## ⚙️ 各系统注意事项
+## 📦 Download
 
-### 🍎 macOS
+Go to [**Releases**](../../releases/latest) and download for your platform:
 
-- **首次使用需授权「辅助功能」权限**，否则无法将文字输入到其他应用：
-  - 系统设置 → 隐私与安全性 → 辅助功能 → 开启 InputSync ✅
-  - 应用内也会有引导提示
-- 关闭窗口不会退出程序，会最小化到 **菜单栏托盘**
-- 右键菜单栏托盘图标 → 「退出」可完全退出
+| Platform | File | Notes |
+|---|---|---|
+| 🍎 **macOS (Apple Silicon)** | `TalkType_x.x.x_aarch64.dmg` | M1 / M2 / M3 / M4 |
+| 🍎 **macOS (Intel)** | `TalkType_x.x.x_x64.dmg` | Older Intel Macs |
+| 🪟 **Windows** | `TalkType_x.x.x_x64-setup.exe` | Windows 10 / 11 |
+| 🐧 **Linux** | `.deb` / `.AppImage` | Ubuntu, Debian, etc. |
 
-### 🪟 Windows
+> 💡 **Which Mac?** Click  → About This Mac → check "Chip". Apple M1/M2/… = `aarch64`, Intel = `x64`.
 
-- 首次运行时，Windows 防火墙可能弹窗询问网络访问权限，请 **选择允许**（否则手机无法连接）
-- 关闭窗口后会在 **系统托盘** 中后台运行
-- 右键托盘图标 → 「退出」可完全退出
-
-### 🐧 Linux
-
-- 需要确保系统已安装 `webkit2gtk` 等依赖（`.deb` 安装包会自动处理）
-- 使用 `.AppImage` 时需先赋予执行权限：`chmod +x InputSync_*.AppImage`
-
-## ❓ 常见问题
+## ⚙️ Platform Notes
 
 <details>
-<summary><b>📱 手机扫码后打不开页面？</b></summary>
+<summary><b>🍎 macOS</b></summary>
 
-- 确认手机和电脑在 **同一个 WiFi** 网络
-- 检查电脑的防火墙是否阻止了 InputSync 的网络访问
-- 尝试关闭 VPN 或代理软件
+- Grant **Accessibility** permission on first launch:
+  System Settings → Privacy & Security → Accessibility → Enable TalkType ✅
+- The app guides you through this on first run
+- Closing the window minimizes to **menu bar tray** (right-click → Quit)
 
 </details>
 
 <details>
-<summary><b>⌨️ 连接成功但电脑没有收到文字？</b></summary>
+<summary><b>🪟 Windows</b></summary>
 
-- **macOS**：请检查是否已授权「辅助功能」权限（系统设置 → 隐私与安全性 → 辅助功能）
-- 确认电脑端有一个 **输入框正在聚焦**（比如打开记事本，点击输入区域）
-- InputSync 将文字输入到 **当前活跃的输入光标位置**
-
-</details>
-
-<details>
-<summary><b>🔌 连接经常断开？</b></summary>
-
-- 检查 WiFi 信号是否稳定
-- InputSync 有自动重连机制，短暂断开后会自动恢复
-- 如果手机锁屏或切换到其他 App，连接可能暂时中断，回到页面后会自动重连
+- Allow **firewall access** when prompted (required for phone to connect)
+- Closing the window minimizes to **system tray** (right-click → Quit)
 
 </details>
 
 <details>
-<summary><b>🔢 默认端口被占用了怎么办？</b></summary>
+<summary><b>🐧 Linux</b></summary>
 
-InputSync 默认使用端口 `5678`。如果被占用，目前需要修改源码中的端口号后重新编译。
+- `.deb` package handles dependencies automatically
+- For `.AppImage`: run `chmod +x TalkType_*.AppImage` first
 
 </details>
 
-## 🏗️ 技术架构
+## ❓ FAQ
+
+<details>
+<summary><b>Why use phone voice input instead of local Whisper?</b></summary>
+
+Phone STT engines (Apple, Google, Samsung) are trained on billions of data points, support 100+ languages natively, and are heavily optimized for mobile hardware. No model download (1–3 GB saved), no GPU required, no configuration — it just works, instantly.
+
+</details>
+
+<details>
+<summary><b>Is my data safe?</b></summary>
+
+Yes. All communication happens over your local WiFi via WebSocket. No data ever leaves your network. No cloud, no accounts, no telemetry.
+
+</details>
+
+<details>
+<summary><b>Phone can't open the page after scanning?</b></summary>
+
+- Ensure phone and computer are on the **same WiFi**
+- Check your computer's firewall settings
+- Try disabling VPN or proxy
+
+</details>
+
+<details>
+<summary><b>Connected but no text appearing?</b></summary>
+
+- **macOS**: Check Accessibility permission (System Settings → Privacy & Security → Accessibility)
+- Make sure an input field is focused on your computer
+- Text goes to wherever your cursor currently is
+
+</details>
+
+## 🔧 How It Works
 
 ```
-┌─────────────┐         WiFi / LAN          ┌──────────────┐
-│  📱 手机端   │ ◄──── WebSocket ────►       │  💻 电脑端    │
-│  (浏览器)    │      实时文字同步            │  (桌面应用)   │
-└─────────────┘                              └──────┬───────┘
-                                                    │
-                                              模拟键盘输入
-                                                    ▼
-                                            当前聚焦的应用
-                                          (文档/聊天/搜索...)
+┌─────────────┐       WiFi (LAN)        ┌──────────────┐
+│  📱 Phone    │  ◄── WebSocket ──►      │  💻 Computer  │
+│  (Browser)   │     real-time sync      │  (Desktop App)│
+│              │                         │       ↓       │
+│  🎤 Voice    │                         │  ⌨️ Keyboard  │
+│  → Text      │                         │   Injection   │
+└─────────────┘                          └───────┬───────┘
+                                                 ↓
+                                          Any Active App
+                                        (Cursor / Claude /
+                                         ChatGPT / Docs)
 ```
 
-- **桌面端**：Tauri 2 + Rust（HTTP/WebSocket 服务 + 键盘模拟）
-- **手机端**：纯 HTML/CSS/JS 网页（由桌面端服务提供，手机免安装）
+**Tech Stack:**
 
-## 🛠️ 开发者指南
+- Desktop: Tauri 2 + Rust (Axum HTTP/WS server + keyboard simulation)
+- Mobile: Pure HTML/CSS/JS PWA (served by desktop app, zero install)
 
-如果你想参与开发或二次修改，请参考以下步骤：
+## 🛠️ Development
 
 <details>
-<summary><b>展开查看开发环境搭建</b></summary>
+<summary><b>Build from source</b></summary>
 
-### 环境要求
+### Prerequisites
 
-- Rust 1.70+（推荐最新 stable）
+- Rust 1.70+ (latest stable recommended)
 - Node.js 18+
-- Tauri CLI：`cargo install tauri-cli --version "^2"`
+- Tauri CLI: `cargo install tauri-cli --version "^2"`
 
-### 快速开始
+### Dev Mode
 
 ```bash
-git clone https://github.com/yourname/InputSync.git
-cd InputSync
+git clone https://github.com/puke3615/TalkType.git
+cd TalkType
 npm install
 cargo tauri dev
 ```
 
-### 项目结构
-
-```
-InputSync/
-├── src/index.html            # 桌面端 UI
-├── src-tauri/
-│   ├── src/
-│   │   ├── lib.rs            # 应用入口 & Tauri 命令
-│   │   ├── server.rs         # HTTP + WebSocket 服务
-│   │   ├── mobile.html       # 手机端页面
-│   │   ├── keyboard.rs       # 键盘模拟（macOS/Windows/Linux）
-│   │   ├── network.rs        # 局域网 IP 发现
-│   │   └── qrcode_gen.rs     # 二维码生成
-│   └── tauri.conf.json       # Tauri 配置
-└── .github/workflows/        # CI/CD 自动构建
-```
-
-### 构建
+### Build
 
 ```bash
 cargo tauri build
 ```
 
-产物在 `src-tauri/target/release/bundle/` 目录下。
+Output: `src-tauri/target/release/bundle/`
+
+### Project Structure
+
+```
+TalkType/
+├── src/index.html              # Desktop UI (i18n, QR code, scene editor)
+├── src-tauri/
+│   ├── src/
+│   │   ├── lib.rs              # App entry & Tauri commands
+│   │   ├── server.rs           # HTTP + WebSocket server (Axum)
+│   │   ├── mobile.html         # Mobile PWA page (i18n, served at /)
+│   │   ├── keyboard.rs         # Keyboard simulation (per-platform)
+│   │   ├── scene.rs            # Scene automation engine
+│   │   ├── network.rs          # LAN IP discovery
+│   │   └── qrcode_gen.rs       # QR code generation
+│   └── tauri.conf.json
+└── .github/workflows/          # CI/CD (macOS + Windows + Linux)
+```
 
 </details>
 
-## 📄 开源协议
+## 📄 License
 
-[MIT License](LICENSE) — 自由使用、修改和分发。
+[MIT](LICENSE) — free to use, modify, and distribute.
 
 ---
 
 <p align="center">
-  如果觉得有用，欢迎给个 ⭐ Star！
+  <b>If TalkType saves you time, give it a ⭐!</b><br>
+  <sub>Built with ❤️ using <a href="https://v2.tauri.app">Tauri 2</a> + Rust</sub>
 </p>

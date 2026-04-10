@@ -1,6 +1,6 @@
 {
   "identifier": "default",
-  "description": "Default capabilities for InputSync",
+  "description": "Default capabilities for TalkType",
   "windows": ["main"],
   "permissions": [
     "core:default",

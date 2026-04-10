@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicktomlin/tauri-settings-schema/main/v2.json",
-  "productName": "InputSync",
+  "productName": "TalkType",
   "version": "1.5.0",
-  "identifier": "com.inputsync.desktop",
+  "identifier": "com.talktype.desktop",
   "build": {
     "frontendDist": "../src"
   },
@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "InputSync",
+        "title": "TalkType",
         "width": 440,
         "height": 680,
         "resizable": true,

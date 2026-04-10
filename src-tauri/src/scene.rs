@@ -317,7 +317,7 @@ fn show_notification(msg: &str) {
     #[cfg(target_os = "macos")]
     {
         let script = format!(
-            "display notification \"{}\" with title \"InputSync\"",
+            "display notification \"{}\" with title \"TalkType\"",
             msg.replace('"', "\\\"").replace('\n', " ")
         );
         let _ = std::process::Command::new("osascript")
@@ -330,7 +330,7 @@ fn show_notification(msg: &str) {
             .args([
                 "-Command",
                 &format!(
-                    "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('{}', 'InputSync')",
+                    "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('{}', 'TalkType')",
                     msg.replace('\'', "''")
                 ),
             ])
@@ -339,7 +339,7 @@ fn show_notification(msg: &str) {
     #[cfg(target_os = "linux")]
     {
         let _ = std::process::Command::new("notify-send")
-            .args(["InputSync", msg])
+            .args(["TalkType", msg])
             .output();
     }
 }
@@ -485,7 +485,7 @@ pub fn execute_scene(scene_id: &str, text: &str) {
             }
             Action::Notification { message } => {
                 let msg = if message.is_empty() {
-                    format!("场景「{}」已执行", scene.name)
+                    format!("Scene '{}' executed", scene.name)
                 } else {
                     message.replace("{text}", &current_text)
                 };

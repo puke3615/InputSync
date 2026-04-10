@@ -21,12 +21,12 @@ fn config_dir() -> PathBuf {
     #[cfg(target_os = "windows")]
     {
         let appdata = std::env::var("APPDATA").unwrap_or_else(|_| ".".into());
-        PathBuf::from(appdata).join("InputSync")
+        PathBuf::from(appdata).join("TalkType")
     }
     #[cfg(not(target_os = "windows"))]
     {
         let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
-        PathBuf::from(home).join(".inputsync")
+        PathBuf::from(home).join(".talktype")
     }
 }
 

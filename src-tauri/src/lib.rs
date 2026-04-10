@@ -107,17 +107,17 @@ fn delete_scene(id: String) -> Vec<scene::Scene> {
 
 #[tauri::command]
 fn export_scene_file(id: String) -> Result<String, String> {
-    let scene = scene::find_scene(&id).ok_or_else(|| "场景不存在".to_string())?;
+    let scene = scene::find_scene(&id).ok_or_else(|| "Scene not found".to_string())?;
     let json = serde_json::to_string_pretty(&scene).map_err(|e| e.to_string())?;
     let safe_name: String = scene
         .name
         .chars()
         .map(|c| if c == '/' || c == '\\' || c == ':' { '_' } else { c })
         .collect();
-    let filename = format!("InputSync-{}.json", safe_name);
+    let filename = format!("TalkType-{}.json", safe_name);
 
     let path = rfd::FileDialog::new()
-        .set_title("导出场景")
+        .set_title("Export Scene")
         .set_file_name(&filename)
         .add_filter("JSON", &["json"])
         .save_file();
@@ -127,14 +127,14 @@ fn export_scene_file(id: String) -> Result<String, String> {
             std::fs::write(&p, &json).map_err(|e| e.to_string())?;
             Ok(p.display().to_string())
         }
-        None => Err("已取消".to_string()),
+        None => Err("Cancelled".to_string()),
     }
 }
 
 #[tauri::command]
 fn import_scene_data(json: String) -> Result<Vec<scene::Scene>, String> {
     let mut s: scene::Scene =
-        serde_json::from_str(&json).map_err(|e| format!("解析失败: {}", e))?;
+        serde_json::from_str(&json).map_err(|e| format!("Parse failed: {}", e))?;
     s.builtin = false;
     s.id = format!(
         "import-{}",
@@ -187,8 +187,8 @@ pub fn run() {
             import_scene_data,
         ])
         .setup(|app| {
-            let quit = MenuItemBuilder::with_id("quit", "退出").build(app)?;
-            let show = MenuItemBuilder::with_id("show", "显示窗口").build(app)?;
+            let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
+            let show = MenuItemBuilder::with_id("show", "Show Window").build(app)?;
             let menu = MenuBuilder::new(app).items(&[&show, &quit]).build()?;
 
             let _tray = TrayIconBuilder::new()

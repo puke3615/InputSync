@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InputSync</title>
+<title>TalkType</title>
 <style>
   :root {
     --primary: #6366f1;
@@ -60,6 +60,14 @@
   }
   .top-bar-btn:hover { border-color: var(--primary); color: var(--primary); }
   .top-bar-spacer { width: 30px; }
+  .top-bar-right { display: flex; align-items: center; gap: 6px; }
+  .lang-btn {
+    font-size: 12px; font-weight: 600; padding: 4px 8px;
+    background: var(--primary-bg); color: var(--primary);
+    border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; transition: all 0.15s; min-width: 30px;
+  }
+  .lang-btn:hover { background: var(--primary); color: #fff; }
 
   .home-center { text-align: center; }
   .home-center h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
@@ -294,68 +302,74 @@
 
 <div id="loader">
   <div class="spin" id="spinner"></div>
-  <div id="loaderMsg">正在启动服务...</div>
+  <div id="loaderMsg" data-i18n="loaderStarting"></div>
 </div>
 <input type="file" id="importFileInput" accept=".json">
 
 <!-- ═══ PAGE: HOME ═══ -->
 <div class="page active" id="pageHome">
   <div class="top-bar">
-    <h1>InputSync</h1>
-    <button class="top-bar-btn" id="goSettingsBtn" title="设置">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-    </button>
+    <h1 data-i18n="appName">TalkType</h1>
+    <div class="top-bar-right">
+      <button type="button" class="lang-btn" id="langBtnHome" data-lang-toggle>EN</button>
+      <button class="top-bar-btn" id="goSettingsBtn" data-i18n="settings" data-i18n-attr="title" title="">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
   </div>
-  <div class="debug-bar"><button id="debugToggle">调试日志</button></div>
+  <div class="debug-bar"><button id="debugToggle" data-i18n="debugToggle"></button></div>
   <div id="debugPanel"></div>
   <div class="page-scroll">
     <div class="page-inner" id="content" style="display:none;">
       <div class="home-center">
-        <h2>InputSync</h2>
-        <p class="subtitle">局域网语音输入同步</p>
+        <h2 data-i18n="appName">TalkType</h2>
+        <p class="subtitle" data-i18n="subtitle"></p>
         <div class="qr-box"><img id="qrImg" alt="" /></div>
-        <div class="qr-tip">手机扫码连接</div>
+        <div class="qr-tip" data-i18n="qrTip"></div>
       </div>
       <div class="url-bar">
         <code id="urlText">-</code>
-        <button id="copyBtn">复制</button>
+        <button id="copyBtn" data-i18n="copyBtn"></button>
       </div>
       <div class="ip-bar" id="ipBar" style="display:none;">
-        <label>网卡:</label>
+        <label data-i18n="ipLabel"></label>
         <select id="ipSel"></select>
       </div>
       <div class="home-center">
-        <div class="status wait" id="statusBadge"><span class="dot"></span><span id="statusLabel">等待手机连接</span></div>
+        <div class="status wait" id="statusBadge"><span class="dot"></span><span id="statusLabel" data-i18n="statusWaiting"></span></div>
       </div>
       <div class="alert" id="permBox" style="display:none;">
-        <b>⚠️ 需要辅助功能权限</b>
-        <p>InputSync 需要「辅助功能」权限才能模拟键盘输入。请在系统设置中授权。</p>
-        <button class="abtn" id="openPermBtn">打开系统设置</button>
-        <button class="abtn2" id="recheckPermBtn">重新检测</button>
+        <b data-i18n="permTitle"></b>
+        <p data-i18n="permDesc"></p>
+        <button class="abtn" id="openPermBtn" data-i18n="openPerm"></button>
+        <button class="abtn2" id="recheckPermBtn" data-i18n="recheckPerm"></button>
       </div>
-      <p class="hint">手机扫描二维码，或在浏览器输入上方地址</p>
+      <p class="hint" data-i18n="hint"></p>
     </div>
   </div>
-  <div class="footer">InputSync v1.0 · 局域网通信 · 无需云服务</div>
+  <div class="footer" data-i18n="footer"></div>
 </div>
 
 <!-- ═══ PAGE: SETTINGS ═══ -->
 <div class="page" id="pageSettings">
   <div class="top-bar">
-    <button class="top-bar-btn" id="goHomeBtn" title="返回">
+    <button class="top-bar-btn" id="goHomeBtn" data-i18n="backTitle" data-i18n-attr="title">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <h1>设置</h1>
-    <div class="top-bar-spacer"></div>
+    <h1 data-i18n="settings"></h1>
+    <div class="top-bar-right">
+      <button type="button" class="lang-btn" id="langBtnSettings" data-lang-toggle>EN</button>
+      <div class="top-bar-spacer"></div>
+    </div>
   </div>
   <div class="page-scroll">
     <div class="page-inner">
       <div class="settings-section">
-        <div class="settings-section-title">场景管理</div>
+        <div class="settings-section-title" data-i18n="sceneManage"></div>
         <div id="sceneList"></div>
         <div class="scene-btns-row">
-          <button class="btn-new-scene" id="addSceneBtn">+ 新建场景</button>
-          <button class="btn-import-scene" id="importSceneBtn">↓ 导入场景</button>
+          <button class="btn-new-scene" id="addSceneBtn" data-i18n="addScene"></button>
+          <button class="btn-import-scene" id="importSceneBtn" data-i18n="importScene"></button>
         </div>
       </div>
     </div>
@@ -365,53 +379,56 @@
 <!-- ═══ PAGE: EDITOR ═══ -->
 <div class="page" id="pageEditor">
   <div class="top-bar">
-    <button class="top-bar-btn" id="edBackBtn" title="返回">
+    <button class="top-bar-btn" id="edBackBtn" data-i18n="backTitle" data-i18n-attr="title" title="">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <h1 id="edPageTitle">新建场景</h1>
-    <div class="top-bar-spacer"></div>
+    <h1 id="edPageTitle"></h1>
+    <div class="top-bar-right">
+      <button type="button" class="lang-btn" id="langBtnEditor" data-lang-toggle>EN</button>
+      <div class="top-bar-spacer"></div>
+    </div>
   </div>
   <div class="page-scroll">
     <div class="page-inner">
       <div class="ed-form">
         <div class="ed-row">
-          <label class="ed-label">场景名称</label>
-          <input class="ed-input" type="text" id="edName" placeholder="例如：微信发送">
+          <label class="ed-label" data-i18n="sceneName"></label>
+          <input class="ed-input" type="text" id="edName" data-i18n="sceneNamePh" data-i18n-attr="placeholder" placeholder="">
         </div>
         <div class="ed-row">
-          <label class="ed-label">场景说明</label>
-          <input class="ed-input" type="text" id="edDesc" placeholder="简要描述用途">
+          <label class="ed-label" data-i18n="sceneDesc"></label>
+          <input class="ed-input" type="text" id="edDesc" data-i18n="sceneDescPh" data-i18n-attr="placeholder" placeholder="">
         </div>
         <div class="ed-row">
-          <label class="ed-label">触发方式</label>
+          <label class="ed-label" data-i18n="triggerType"></label>
           <div class="trigger-row">
             <select class="ed-select" id="edTriggerType">
-              <option value="Manual">手动触发</option>
-              <option value="Silence">静默超时</option>
+              <option value="Manual" data-i18n="triggerManual"></option>
+              <option value="Silence" data-i18n="triggerSilence"></option>
             </select>
             <input class="ed-input" type="number" id="edTimeout" value="2000" min="500" max="30000" step="100" style="display:none;">
-            <span class="unit" id="edTimeoutUnit" style="display:none;">ms</span>
+            <span class="unit" id="edTimeoutUnit" style="display:none;" data-i18n="ms"></span>
           </div>
         </div>
         <div class="ed-row">
           <label class="check-row">
             <input type="checkbox" id="edRealtimeSync" checked>
-            <span class="check-label">实时同步文字</span>
-            <span class="check-hint">（关闭后仅触发时发送）</span>
+            <span class="check-label" data-i18n="realtimeSync"></span>
+            <span class="check-hint" data-i18n="realtimeSyncHint"></span>
           </label>
         </div>
         <div class="ed-row">
-          <label class="ed-label">动作序列</label>
+          <label class="ed-label" data-i18n="actionSequence"></label>
           <div class="action-list" id="edActionList"></div>
-          <button class="btn-add-action" id="addActionBtn">+ 添加动作</button>
+          <button class="btn-add-action" id="addActionBtn" data-i18n="addAction"></button>
         </div>
         <div class="editor-footer">
-          <button class="btn-cancel" id="cancelEditBtn">取消</button>
-          <button class="btn-save" id="saveEditBtn">保存</button>
+          <button class="btn-cancel" id="cancelEditBtn" data-i18n="cancel"></button>
+          <button class="btn-save" id="saveEditBtn" data-i18n="save"></button>
         </div>
         <div class="ed-bottom-btns" id="edBottomBtns" style="display:none;">
-          <button class="btn-export-scene" id="edExportBtn">↑ 导出</button>
-          <button class="btn-delete-scene" id="edDeleteBtn">删除此场景</button>
+          <button class="btn-export-scene" id="edExportBtn" data-i18n="exportBtn"></button>
+          <button class="btn-delete-scene" id="edDeleteBtn"></button>
         </div>
       </div>
     </div>
@@ -420,28 +437,344 @@
 
 <script>
 (function() {
+  var LANG = {
+    en: {
+      appName: 'TalkType',
+      subtitle: 'Speak to type · Phone voice to computer',
+      loaderStarting: 'Starting service...',
+      loaderFetching: 'Fetching server info...',
+      loaderFailed: 'Service failed to start, please restart',
+      loaderError: 'Start error: ',
+      debugToggle: 'Debug Log',
+      qrTip: 'Scan with phone to connect',
+      copyBtn: 'Copy',
+      copied: 'Copied ✓',
+      ipLabel: 'Network:',
+      statusWaiting: 'Waiting for phone...',
+      statusConnected: '{count} device(s) connected',
+      permTitle: '⚠️ Accessibility Permission Required',
+      permDesc: 'TalkType needs Accessibility permission to simulate keyboard input. Please grant access in System Settings.',
+      openPerm: 'Open System Settings',
+      recheckPerm: 'Check Again',
+      hint: 'Scan QR with your phone, speak instead of type',
+      footer: 'TalkType · Voice input to any app · LAN only · Private',
+      settings: 'Settings',
+      sceneManage: 'SCENE MANAGEMENT',
+      addScene: '+ New Scene',
+      importScene: '↓ Import Scene',
+      newScene: 'New Scene',
+      editScene: 'Edit Scene',
+      sceneName: 'SCENE NAME',
+      sceneNamePh: 'e.g. Auto Send',
+      sceneDesc: 'DESCRIPTION',
+      sceneDescPh: 'Brief description of this scene',
+      triggerType: 'TRIGGER',
+      triggerManual: 'Manual',
+      triggerSilence: 'Silence Timeout',
+      realtimeSync: 'Real-time text sync',
+      realtimeSyncHint: '(Send only on trigger when off)',
+      actionSequence: 'ACTION SEQUENCE',
+      addAction: '+ Add Action',
+      cancel: 'Cancel',
+      save: 'Save',
+      exportBtn: '↑ Export',
+      deleteScene: 'Delete Scene',
+      confirmDelete: 'Confirm delete?',
+      noActionsHint: 'No actions yet. Click the button below to add.',
+      pressKeyPh: 'Click here, then press a key combo',
+      pressKeyCapturing: 'Press a key combo...',
+      execute: 'Execute',
+      timesInterval: 'time(s), interval',
+      ms: 'ms',
+      msUnit: 'milliseconds',
+      silenceMs: 'Silence {ms}ms',
+      manual: 'Manual',
+      actionsCount: '{count} action(s)',
+      noActions: 'No actions',
+      builtin: 'Built-in',
+      importSuccess: 'Scene imported',
+      importFailed: 'Import failed: ',
+      exportedTo: 'Exported to: ',
+      exportFailed: 'Export failed: ',
+      sceneSaved: 'Scene saved: ',
+      saveFailed: 'Save failed: ',
+      deleteFailed: 'Delete failed: ',
+      logAppStart: 'App starting...',
+      logTauriOk: 'Tauri API available',
+      logHttpFallback: 'Using HTTP fallback',
+      logTauriErr: 'Tauri detection error: ',
+      logLoadedScenes: 'Loaded {count} scene(s)',
+      logLoadFailed: 'Failed to load scenes: ',
+      syncTextDesc: 'Insert current text at computer cursor (works with text transforms)',
+      typeTextPh: 'Text to type, supports {text} placeholder',
+      clipboardDesc: 'Copy current text to clipboard (use with ⌘V to paste)',
+      clearDesc: 'Clear current input field on computer',
+      appNamePh: 'App name, e.g. Safari, Chrome',
+      urlPh: 'URL template, use {text} as placeholder',
+      urlExample: 'e.g. https://google.com/search?q={text}',
+      notifPh: 'Notification message, supports {text}',
+      timeout: 'Timeout',
+      keywordPh: 'Keyword',
+      prefixPh: 'Prefix',
+      suffixPh: 'Suffix',
+      prefixContent: 'Prefix text',
+      suffixContent: 'Suffix text',
+      findContent: 'Find',
+      replaceWith: 'Replace with',
+      assertFail: 'Stops remaining actions when condition fails',
+      chars: 'character(s)',
+      actionKeyPress: 'Key Press',
+      actionDelay: 'Delay',
+      actionSyncText: 'Sync Text',
+      actionTypeText: 'Type Text',
+      actionClipboard: 'Set Clipboard',
+      actionClear: 'Clear',
+      actionTransform: 'Text Transform',
+      actionFocusApp: 'Focus App',
+      actionOpenUrl: 'Open URL',
+      actionNotify: 'Notification',
+      actionWaitWindow: 'Wait for Window',
+      actionAssert: 'Assert',
+      transformTrim: 'Trim whitespace',
+      transformUpper: 'To Uppercase',
+      transformLower: 'To Lowercase',
+      transformUrl: 'URL Encode',
+      transformStripPunc: 'Strip all punctuation',
+      transformStripLeading: 'Strip leading punctuation',
+      transformPrefix: 'Add Prefix',
+      transformSuffix: 'Add Suffix',
+      transformReplace: 'Replace',
+      condFgApp: 'Foreground app is...',
+      condContains: 'Text contains...',
+      condNotContains: 'Text doesn\'t contain...',
+      condStartsWith: 'Text starts with...',
+      condEndsWith: 'Text ends with...',
+      condMinLength: 'Text min length',
+      backTitle: 'Back',
+      actionMoveUp: 'Move up',
+      actionMoveDown: 'Move down',
+      actionDel: 'Remove',
+      waitWindowAppPh: 'App name'
+    },
+    zh: {
+      appName: 'TalkType',
+      subtitle: '说话即打字 · 手机语音输入到电脑',
+      loaderStarting: '正在启动服务...',
+      loaderFetching: '正在获取服务信息...',
+      loaderFailed: '服务启动失败，请重启应用',
+      loaderError: '启动异常: ',
+      debugToggle: '调试日志',
+      qrTip: '手机扫码连接',
+      copyBtn: '复制',
+      copied: '已复制 ✓',
+      ipLabel: '网卡:',
+      statusWaiting: '等待手机连接',
+      statusConnected: '{count} 台设备已连接',
+      permTitle: '⚠️ 需要辅助功能权限',
+      permDesc: 'TalkType 需要「辅助功能」权限才能模拟键盘输入。请在系统设置中授权。',
+      openPerm: '打开系统设置',
+      recheckPerm: '重新检测',
+      hint: '手机扫描二维码，用语音输入替代键盘打字',
+      footer: 'TalkType · 语音输入到任意应用 · 纯局域网 · 隐私安全',
+      settings: '设置',
+      sceneManage: '场景管理',
+      addScene: '+ 新建场景',
+      importScene: '↓ 导入场景',
+      newScene: '新建场景',
+      editScene: '编辑场景',
+      sceneName: '场景名称',
+      sceneNamePh: '例如：微信发送',
+      sceneDesc: '场景说明',
+      sceneDescPh: '简要描述用途',
+      triggerType: '触发方式',
+      triggerManual: '手动触发',
+      triggerSilence: '静默超时',
+      realtimeSync: '实时同步文字',
+      realtimeSyncHint: '（关闭后仅触发时发送）',
+      actionSequence: '动作序列',
+      addAction: '+ 添加动作',
+      cancel: '取消',
+      save: '保存',
+      exportBtn: '↑ 导出',
+      deleteScene: '删除此场景',
+      confirmDelete: '确认删除？',
+      noActionsHint: '暂无动作，点击下方按钮添加',
+      pressKeyPh: '点击此处，然后按下快捷键',
+      pressKeyCapturing: '请按下快捷键...',
+      execute: '执行',
+      timesInterval: '次，间隔',
+      ms: 'ms',
+      msUnit: '毫秒',
+      silenceMs: '静默 {ms}ms',
+      manual: '手动',
+      actionsCount: '{count} 个动作',
+      noActions: '无动作',
+      builtin: '内置',
+      importSuccess: '场景导入成功',
+      importFailed: '导入失败: ',
+      exportedTo: '已导出到: ',
+      exportFailed: '导出失败: ',
+      sceneSaved: '场景已保存: ',
+      saveFailed: '保存失败: ',
+      deleteFailed: '删除失败: ',
+      logAppStart: '应用启动...',
+      logTauriOk: 'Tauri API 可用',
+      logHttpFallback: '将使用 HTTP 备用方案',
+      logTauriErr: 'Tauri 检测异常: ',
+      logLoadedScenes: '加载 {count} 个场景',
+      logLoadFailed: '加载场景失败: ',
+      syncTextDesc: '将当前文字输入到电脑光标位置（可配合文本转换预处理）',
+      typeTextPh: '要输入的文字，支持 {text} 占位符',
+      clipboardDesc: '将当前文字写入系统剪贴板（可配合按键 ⌘V 粘贴）',
+      clearDesc: '清空电脑当前输入框内容',
+      appNamePh: '应用名称，如 Safari、微信',
+      urlPh: 'URL模板，用 {text} 表示文字',
+      urlExample: '例: https://google.com/search?q={text}',
+      notifPh: '通知内容，支持 {text}，留空使用默认',
+      timeout: '超时',
+      keywordPh: '关键词',
+      prefixPh: '前缀',
+      suffixPh: '后缀',
+      prefixContent: '前缀内容',
+      suffixContent: '后缀内容',
+      findContent: '查找内容',
+      replaceWith: '替换为',
+      assertFail: '条件不满足时停止执行后续动作',
+      chars: '个字符',
+      actionKeyPress: '按键',
+      actionDelay: '延迟',
+      actionSyncText: '同步文字',
+      actionTypeText: '输入文字',
+      actionClipboard: '写入剪贴板',
+      actionClear: '清空',
+      actionTransform: '文本转换',
+      actionFocusApp: '聚焦应用',
+      actionOpenUrl: '打开URL',
+      actionNotify: '通知',
+      actionWaitWindow: '等待窗口',
+      actionAssert: '条件检测',
+      transformTrim: '去除首尾空白',
+      transformUpper: '转大写',
+      transformLower: '转小写',
+      transformUrl: 'URL编码',
+      transformStripPunc: '去除所有标点',
+      transformStripLeading: '去除标点前缀',
+      transformPrefix: '添加前缀',
+      transformSuffix: '添加后缀',
+      transformReplace: '替换',
+      condFgApp: '前台应用是...',
+      condContains: '文字包含...',
+      condNotContains: '文字不包含...',
+      condStartsWith: '文字开头是...',
+      condEndsWith: '文字结尾是...',
+      condMinLength: '文字最小长度',
+      backTitle: '返回',
+      actionMoveUp: '上移',
+      actionMoveDown: '下移',
+      actionDel: '删除',
+      waitWindowAppPh: '应用名称'
+    }
+  };
+
+  var storedLang = localStorage.getItem('tt_lang');
+  var currentLang = (storedLang === 'en' || storedLang === 'zh') ? storedLang : (navigator.language && navigator.language.toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en');
+
+  function t(key, params) {
+    var pack = LANG[currentLang] || LANG.en;
+    var s = pack[key];
+    if (s === undefined) s = LANG.en[key];
+    if (s === undefined) return key;
+    if (!params) return s;
+    return String(s).replace(/\{(\w+)\}/g, function(_, name) {
+      return Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : '{' + name + '}';
+    });
+  }
+
+  function updateLangToggleButtons() {
+    var label = currentLang === 'zh' ? 'EN' : '中';
+    document.querySelectorAll('[data-lang-toggle]').forEach(function(b) { b.textContent = label; });
+  }
+
+  var lastClientCount = 0;
+  function updateStatusLabel() {
+    var l = document.getElementById('statusLabel');
+    if (!l) return;
+    if (lastClientCount > 0) l.textContent = t('statusConnected', { count: lastClientCount });
+    else l.textContent = t('statusWaiting');
+  }
+
+  function applyI18n() {
+    document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-CN' : 'en');
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      if (el.hasAttribute('data-lang-toggle')) return;
+      var key = el.getAttribute('data-i18n');
+      if (!key) return;
+      var attr = el.getAttribute('data-i18n-attr');
+      var val = t(key);
+      if (attr === 'placeholder') el.placeholder = val;
+      else if (attr === 'title') el.title = val;
+      else el.textContent = val;
+    });
+    updateLangToggleButtons();
+    updateStatusLabel();
+  }
+
+  function switchLang(lang) {
+    if (lang !== 'en' && lang !== 'zh') return;
+    currentLang = lang;
+    localStorage.setItem('tt_lang', lang);
+    applyI18n();
+    if (document.getElementById('pageSettings').classList.contains('active')) renderSceneList();
+    if (document.getElementById('pageEditor').classList.contains('active')) {
+      refreshEditorTitle();
+      var db = document.getElementById('edDeleteBtn');
+      if (db) db.textContent = db._confirming ? t('confirmDelete') : t('deleteScene');
+      renderActionList();
+    }
+  }
+
+  function refreshEditorTitle() {
+    var scene = null;
+    if (editingId) {
+      for (var i = 0; i < allScenes.length; i++) {
+        if (allScenes[i].id === editingId) { scene = allScenes[i]; break; }
+      }
+    }
+    document.getElementById('edPageTitle').textContent = scene ? t('editScene') : t('newScene');
+  }
+
+  document.querySelectorAll('[data-lang-toggle]').forEach(function(btn) {
+    btn.addEventListener('click', function() { switchLang(currentLang === 'zh' ? 'en' : 'zh'); });
+  });
+
+  function getActionTypes() {
+    return [
+      {v:'KeyPress',t:t('actionKeyPress')},{v:'Delay',t:t('actionDelay')},{v:'SyncText',t:t('actionSyncText')},
+      {v:'TypeText',t:t('actionTypeText')},{v:'SetClipboard',t:t('actionClipboard')},{v:'ClearInput',t:t('actionClear')},
+      {v:'TextTransform',t:t('actionTransform')},{v:'FocusApp',t:t('actionFocusApp')},
+      {v:'OpenUrl',t:t('actionOpenUrl')},{v:'Notification',t:t('actionNotify')},
+      {v:'WaitForWindow',t:t('actionWaitWindow')},{v:'Assert',t:t('actionAssert')}
+    ];
+  }
+  function getTransformTypes() {
+    return [
+      {v:'Trim',t:t('transformTrim')},{v:'ToUpperCase',t:t('transformUpper')},{v:'ToLowerCase',t:t('transformLower')},
+      {v:'UrlEncode',t:t('transformUrl')},{v:'StripPunctuation',t:t('transformStripPunc')},
+      {v:'StripLeadingPunctuation',t:t('transformStripLeading')},
+      {v:'AddPrefix',t:t('transformPrefix')},{v:'AddSuffix',t:t('transformSuffix')},{v:'Replace',t:t('transformReplace')}
+    ];
+  }
+  function getConditionTypes() {
+    return [
+      {v:'ForegroundApp',t:t('condFgApp')},{v:'TextContains',t:t('condContains')},
+      {v:'TextNotContains',t:t('condNotContains')},{v:'TextStartsWith',t:t('condStartsWith')},
+      {v:'TextEndsWith',t:t('condEndsWith')},{v:'TextMinLength',t:t('condMinLength')}
+    ];
+  }
+
   var logs=[], debugVisible=false, invoke=null, listen=null, serverUrl='', serverPort=5678;
   var allScenes=[], editingId=null, editActions=[];
   var isMac = navigator.platform.indexOf('Mac') !== -1;
-
-  var ACTION_TYPES = [
-    {v:'KeyPress',t:'按键'},{v:'Delay',t:'延迟'},{v:'SyncText',t:'同步文字'},
-    {v:'TypeText',t:'输入文字'},{v:'SetClipboard',t:'写入剪贴板'},{v:'ClearInput',t:'清空'},
-    {v:'TextTransform',t:'文本转换'},{v:'FocusApp',t:'聚焦应用'},
-    {v:'OpenUrl',t:'打开URL'},{v:'Notification',t:'通知'},
-    {v:'WaitForWindow',t:'等待窗口'},{v:'Assert',t:'条件检测'}
-  ];
-  var TRANSFORM_TYPES = [
-    {v:'Trim',t:'去除首尾空白'},{v:'ToUpperCase',t:'转大写'},{v:'ToLowerCase',t:'转小写'},
-    {v:'UrlEncode',t:'URL编码'},{v:'StripPunctuation',t:'去除所有标点'},
-    {v:'StripLeadingPunctuation',t:'去除标点前缀'},
-    {v:'AddPrefix',t:'添加前缀'},{v:'AddSuffix',t:'添加后缀'},{v:'Replace',t:'替换'}
-  ];
-  var CONDITION_TYPES = [
-    {v:'ForegroundApp',t:'前台应用是...'},{v:'TextContains',t:'文字包含...'},
-    {v:'TextNotContains',t:'文字不包含...'},{v:'TextStartsWith',t:'文字开头是...'},
-    {v:'TextEndsWith',t:'文字结尾是...'},{v:'TextMinLength',t:'文字最小长度'}
-  ];
 
   function showPage(id) {
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -460,31 +793,31 @@
     if(logs.length>300)logs.shift();
     var el=document.getElementById('debugPanel');
     el.textContent=logs.join('\n'); el.scrollTop=el.scrollHeight;
-    console.log('[InputSync]',m);
+    console.log('[TalkType]',m);
   }
   function showLoader(m){document.getElementById('loader').classList.remove('hide');document.getElementById('loaderMsg').textContent=m;}
   function hideLoader(){document.getElementById('loader').classList.add('hide');document.getElementById('content').style.display='';}
   function showError(m){document.getElementById('loaderMsg').textContent=m;document.getElementById('spinner').style.display='none';}
 
   async function init(){
-    log('应用启动...'); showLoader('正在启动服务...');
+    log(t('logAppStart')); showLoader(t('loaderStarting'));
     var hasTauri=false;
     try{
       if(window.__TAURI__&&window.__TAURI__.core&&window.__TAURI__.core.invoke){
         invoke=window.__TAURI__.core.invoke;
         listen=window.__TAURI__.event?window.__TAURI__.event.listen:null;
-        hasTauri=true; log('Tauri API 可用');
-      } else { log('将使用 HTTP 备用方案'); }
-    }catch(e){log('Tauri 检测异常: '+e.message);}
+        hasTauri=true; log(t('logTauriOk'));
+      } else { log(t('logHttpFallback')); }
+    }catch(e){log(t('logTauriErr')+e.message);}
 
-    showLoader('正在获取服务信息...');
+    showLoader(t('loaderFetching'));
     var info=null;
     for(var i=0;i<20;i++){
       if(hasTauri&&!info){try{info=await invoke('get_server_info');}catch(e){}}
       if(!info){try{var r=await fetch('http://127.0.0.1:'+serverPort+'/api/info');if(r.ok)info=await r.json();}catch(e){}}
       if(info)break; await sleep(500);
     }
-    if(!info){showError('服务启动失败，请重启应用');return;}
+    if(!info){showError(t('loaderFailed'));return;}
 
     serverUrl=info.url;
     document.getElementById('qrImg').src=info.qrcode_data_url||info.qrcode||('http://127.0.0.1:'+serverPort+'/api/qrcode');
@@ -497,22 +830,25 @@
     var sel=document.getElementById('ipSel'); sel.innerHTML='';
     ips.forEach(function(ip){var o=document.createElement('option');o.value=ip;o.textContent=ip;if(ip===info.ip)o.selected=true;sel.appendChild(o);});
     if(ips.length>1)document.getElementById('ipBar').style.display='';
+    applyI18n();
     hideLoader();
 
     if(listen){try{listen('client-count',function(ev){
       var c=ev.payload.count,b=document.getElementById('statusBadge'),l=document.getElementById('statusLabel');
-      if(c>0){b.className='status ok';l.textContent=c+' 台设备已连接';}
-      else{b.className='status wait';l.textContent='等待手机连接';}
+      lastClientCount=c;
+      if(c>0){b.className='status ok';l.textContent=t('statusConnected',{count:c});}
+      else{b.className='status wait';l.textContent=t('statusWaiting');}
     });}catch(e){}}
 
     if(hasTauri){
       try{var ok=await invoke('check_accessibility');document.getElementById('permBox').style.display=ok?'none':'';}catch(e){}
       await loadScenes();
     }
+    applyI18n();
   }
 
   document.getElementById('copyBtn').addEventListener('click',async function(){
-    try{await navigator.clipboard.writeText(serverUrl);this.textContent='已复制✓';var b=this;setTimeout(function(){b.textContent='复制';},1200);}catch(e){}
+    try{await navigator.clipboard.writeText(serverUrl);this.textContent=t('copied');var b=this;setTimeout(function(){b.textContent=t('copyBtn');},1200);}catch(e){}
   });
   document.getElementById('ipSel').addEventListener('change',async function(){
     var ip=this.value; serverUrl='http://'+ip+':'+serverPort;
@@ -528,23 +864,23 @@
   document.getElementById('addSceneBtn').addEventListener('click',function(){openEditor(null);});
 
   async function loadScenes(){
-    try{allScenes=await invoke('get_scenes');renderSceneList();log('加载 '+allScenes.length+' 个场景');}
-    catch(e){log('加载场景失败: '+e);}
+    try{allScenes=await invoke('get_scenes');renderSceneList();log(t('logLoadedScenes',{count:allScenes.length}));}
+    catch(e){log(t('logLoadFailed')+e);}
   }
 
   function renderSceneList(){
     var list=document.getElementById('sceneList'); list.innerHTML='';
     allScenes.forEach(function(scene){
       var div=document.createElement('div'); div.className='scene-item';
-      var trig=(scene.trigger&&scene.trigger.type==='Silence')?'静默 '+scene.trigger.timeout_ms+'ms':'手动';
-      var acts=scene.actions.length>0?scene.actions.length+' 个动作':'无动作';
+      var trig=(scene.trigger&&scene.trigger.type==='Silence')?t('silenceMs',{ms:scene.trigger.timeout_ms}):t('manual');
+      var acts=scene.actions.length>0?t('actionsCount',{count:scene.actions.length}):t('noActions');
       div.innerHTML=
         '<div class="scene-item-icon">'+sceneIcon(scene)+'</div>'+
         '<div class="scene-item-info">'+
           '<div class="scene-item-name">'+esc(scene.name)+'</div>'+
           '<div class="scene-item-desc">'+esc(scene.description||trig+' · '+acts)+'</div>'+
         '</div>'+
-        (scene.builtin?'<span class="scene-item-tag">内置</span>':'')+
+        (scene.builtin?'<span class="scene-item-tag">'+esc(t('builtin'))+'</span>':'')+
         '<span class="scene-item-arrow">›</span>';
       div.addEventListener('click',function(){openEditor(scene);});
       list.appendChild(div);
@@ -565,8 +901,8 @@
     reader.onload=async function(){
       try{
         allScenes=await invoke('import_scene_data',{json:reader.result});
-        renderSceneList(); log('场景导入成功');
-      }catch(e){log('导入失败: '+e); alert('导入失败: '+e);}
+        renderSceneList(); log(t('importSuccess'));
+      }catch(e){log(t('importFailed')+e); alert(t('importFailed')+e);}
     };
     reader.readAsText(file);
     this.value='';
@@ -575,10 +911,11 @@
     if(!editingId||!invoke)return;
     try{
       var path=await invoke('export_scene_file',{id:editingId});
-      log('已导出到: '+path);
-      alert('已导出到:\n'+path);
+      log(t('exportedTo')+path);
+      alert(t('exportedTo')+'\n'+path);
     }catch(e){
-      if(String(e).indexOf('已取消')===-1) log('导出失败: '+e);
+      var es=String(e);
+      if(es.indexOf('已取消')===-1&&es.toLowerCase().indexOf('cancel')===-1) log(t('exportFailed')+e);
     }
   });
 
@@ -595,15 +932,15 @@
   });
   document.getElementById('edDeleteBtn').addEventListener('click',async function(){
     if(!editingId)return;
-    this.textContent='确认删除？';
+    this.textContent=t('confirmDelete');
     var btn=this;
-    btn._confirmTimer=setTimeout(function(){btn.textContent='删除此场景';},2000);
+    btn._confirmTimer=setTimeout(function(){btn.textContent=t('deleteScene');},2000);
     if(btn._confirming){
       clearTimeout(btn._confirmTimer);
       btn._confirming=false;
       try{allScenes=await invoke('delete_scene',{id:editingId});renderSceneList();showPage('pageSettings');}
-      catch(e){log('删除失败: '+e);}
-      btn.textContent='删除此场景';
+      catch(e){log(t('deleteFailed')+e);}
+      btn.textContent=t('deleteScene');
     } else {
       btn._confirming=true;
     }
@@ -611,7 +948,7 @@
 
   function openEditor(scene){
     editingId=scene?scene.id:null;
-    document.getElementById('edPageTitle').textContent=scene?'编辑场景':'新建场景';
+    document.getElementById('edPageTitle').textContent=scene?t('editScene'):t('newScene');
     document.getElementById('edName').value=scene?scene.name:'';
     document.getElementById('edDesc').value=scene?(scene.description||''):'';
     var tt=(scene&&scene.trigger)?scene.trigger.type:'Manual';
@@ -625,7 +962,7 @@
 
     var bb=document.getElementById('edBottomBtns');
     var delBtn=document.getElementById('edDeleteBtn');
-    delBtn.textContent='删除此场景'; delBtn._confirming=false;
+    delBtn.textContent=t('deleteScene'); delBtn._confirming=false;
     if(scene&&!scene.builtin){
       bb.style.display='';
       delBtn.style.display='';
@@ -670,15 +1007,15 @@
       allScenes=await invoke('save_scene',{newScene:obj});
       renderSceneList();
       showPage('pageSettings');
-      log('场景已保存: '+name);
-    }catch(e){log('保存失败: '+e);}
+      log(t('sceneSaved')+name);
+    }catch(e){log(t('saveFailed')+e);}
   }
 
   // ─── Action List Rendering ───
   function renderActionList(){
     var c=document.getElementById('edActionList'); c.innerHTML='';
     if(!editActions.length){
-      c.innerHTML='<div style="font-size:12px;color:var(--text3);padding:12px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:8px;">暂无动作，点击下方按钮添加</div>';
+      c.innerHTML='<div style="font-size:12px;color:var(--text3);padding:12px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:8px;">'+esc(t('noActionsHint'))+'</div>';
       return;
     }
     editActions.forEach(function(action,idx){
@@ -689,7 +1026,7 @@
       head.appendChild(num);
 
       var typeSel=document.createElement('select'); typeSel.className='action-type-sel';
-      ACTION_TYPES.forEach(function(tp){
+      getActionTypes().forEach(function(tp){
         var o=document.createElement('option');o.value=tp.v;o.textContent=tp.t;
         if(tp.v===action.type)o.selected=true;typeSel.appendChild(o);
       });
@@ -713,9 +1050,9 @@
       head.appendChild(spacer);
 
       var btns=document.createElement('div');btns.className='action-btns';
-      if(idx>0){var ub=document.createElement('button');ub.textContent='↑';ub.title='上移';ub.addEventListener('click',function(e){e.stopPropagation();moveAct(idx,-1);});btns.appendChild(ub);}
-      if(idx<editActions.length-1){var db=document.createElement('button');db.textContent='↓';db.title='下移';db.addEventListener('click',function(e){e.stopPropagation();moveAct(idx,1);});btns.appendChild(db);}
-      var rb=document.createElement('button');rb.className='del';rb.textContent='✕';rb.title='删除';
+      if(idx>0){var ub=document.createElement('button');ub.textContent='↑';ub.title=t('actionMoveUp');ub.addEventListener('click',function(e){e.stopPropagation();moveAct(idx,-1);});btns.appendChild(ub);}
+      if(idx<editActions.length-1){var db=document.createElement('button');db.textContent='↓';db.title=t('actionMoveDown');db.addEventListener('click',function(e){e.stopPropagation();moveAct(idx,1);});btns.appendChild(db);}
+      var rb=document.createElement('button');rb.className='del';rb.textContent='✕';rb.title=t('actionDel');
       rb.addEventListener('click',function(e){e.stopPropagation();editActions.splice(idx,1);renderActionList();});
       btns.appendChild(rb);
       head.appendChild(btns);
@@ -733,18 +1070,18 @@
 
     if(T==='KeyPress'){
       var ki=document.createElement('input');ki.className='key-capture';ki.readOnly=true;
-      ki.placeholder='点击此处，然后按下快捷键';
+      ki.placeholder=t('pressKeyPh');
       if(action.keys&&action.keys.length>0)ki.value=fmtKeys(action.keys);
       setupKeyCapture(ki,function(keys){editActions[idx].keys=keys;});
       body.appendChild(ki);
       var rw=document.createElement('div');rw.className='sub-row-inline';
-      var rl=document.createElement('span');rl.className='unit';rl.textContent='执行';
+      var rl=document.createElement('span');rl.className='unit';rl.textContent=t('execute');
       var ri=document.createElement('input');ri.type='number';ri.value=action.repeat||1;ri.min=1;ri.max=100;ri.style.width='60px';ri.style.textAlign='center';
       ri.addEventListener('change',function(){editActions[idx].repeat=parseInt(this.value)||1;});
-      var rl2=document.createElement('span');rl2.className='unit';rl2.textContent='次，间隔';
+      var rl2=document.createElement('span');rl2.className='unit';rl2.textContent=t('timesInterval');
       var di=document.createElement('input');di.type='number';di.value=action.repeat_delay_ms||50;di.min=0;di.step=10;di.style.width='60px';di.style.textAlign='center';
       di.addEventListener('change',function(){editActions[idx].repeat_delay_ms=parseInt(this.value)||0;});
-      var rl3=document.createElement('span');rl3.className='unit';rl3.textContent='ms';
+      var rl3=document.createElement('span');rl3.className='unit';rl3.textContent=t('ms');
       rw.appendChild(rl);rw.appendChild(ri);rw.appendChild(rl2);rw.appendChild(di);rw.appendChild(rl3);
       body.appendChild(rw);
     }
@@ -752,33 +1089,33 @@
       var w=document.createElement('div');w.className='delay-wrap';
       var di=document.createElement('input');di.type='number';di.value=action.ms||200;di.min=0;di.step=50;
       di.addEventListener('change',function(){editActions[idx].ms=parseInt(this.value)||0;});
-      var u=document.createElement('span');u.className='unit';u.textContent='毫秒';
+      var u=document.createElement('span');u.className='unit';u.textContent=t('msUnit');
       w.appendChild(di);w.appendChild(u);body.appendChild(w);
     }
     else if(T==='SyncText'){
       var lb=document.createElement('span');lb.className='auto-label';
-      lb.textContent='将当前文字输入到电脑光标位置（可配合文本转换预处理）';
+      lb.textContent=t('syncTextDesc');
       body.appendChild(lb);
     }
     else if(T==='TypeText'){
-      var ti=document.createElement('input');ti.type='text';ti.placeholder='要输入的文字，支持 {text} 占位符';ti.value=action.text||'';
+      var ti=document.createElement('input');ti.type='text';ti.placeholder=t('typeTextPh');ti.value=action.text||'';
       ti.addEventListener('input',function(){editActions[idx].text=this.value;});
       body.appendChild(ti);
     }
     else if(T==='SetClipboard'){
       var lb=document.createElement('span');lb.className='auto-label';
-      lb.textContent='将当前文字写入系统剪贴板（可配合按键 ⌘V 粘贴）';
+      lb.textContent=t('clipboardDesc');
       body.appendChild(lb);
     }
     else if(T==='ClearInput'){
       var lb=document.createElement('span');lb.className='auto-label';
-      lb.textContent='清空电脑当前输入框内容';
+      lb.textContent=t('clearDesc');
       body.appendChild(lb);
     }
     else if(T==='TextTransform'){
       var tf=action.transform||{type:'Trim'};
       var ts=document.createElement('select');
-      TRANSFORM_TYPES.forEach(function(tp){
+      getTransformTypes().forEach(function(tp){
         var o=document.createElement('option');o.value=tp.v;o.textContent=tp.t;
         if(tp.v===tf.type)o.selected=true;ts.appendChild(o);
       });
@@ -793,58 +1130,58 @@
 
       if(tf.type==='AddPrefix'){
         var r=document.createElement('div');r.className='sub-row';
-        var pi=document.createElement('input');pi.type='text';pi.placeholder='前缀内容';pi.value=tf.prefix||'';
+        var pi=document.createElement('input');pi.type='text';pi.placeholder=t('prefixContent');pi.value=tf.prefix||'';
         pi.addEventListener('input',function(){editActions[idx].transform.prefix=this.value;});
         r.appendChild(pi);body.appendChild(r);
       } else if(tf.type==='AddSuffix'){
         var r=document.createElement('div');r.className='sub-row';
-        var si=document.createElement('input');si.type='text';si.placeholder='后缀内容';si.value=tf.suffix||'';
+        var si=document.createElement('input');si.type='text';si.placeholder=t('suffixContent');si.value=tf.suffix||'';
         si.addEventListener('input',function(){editActions[idx].transform.suffix=this.value;});
         r.appendChild(si);body.appendChild(r);
       } else if(tf.type==='Replace'){
         var r1=document.createElement('div');r1.className='sub-row';
-        var fi=document.createElement('input');fi.type='text';fi.placeholder='查找内容';fi.value=tf.from||'';
+        var fi=document.createElement('input');fi.type='text';fi.placeholder=t('findContent');fi.value=tf.from||'';
         fi.addEventListener('input',function(){editActions[idx].transform.from=this.value;});
         r1.appendChild(fi);body.appendChild(r1);
         var r2=document.createElement('div');r2.className='sub-row';
-        var ri=document.createElement('input');ri.type='text';ri.placeholder='替换为';ri.value=tf.to||'';
+        var ri=document.createElement('input');ri.type='text';ri.placeholder=t('replaceWith');ri.value=tf.to||'';
         ri.addEventListener('input',function(){editActions[idx].transform.to=this.value;});
         r2.appendChild(ri);body.appendChild(r2);
       }
     }
     else if(T==='FocusApp'){
-      var ai=document.createElement('input');ai.type='text';ai.placeholder='应用名称，如 Safari、微信';ai.value=action.app_name||'';
+      var ai=document.createElement('input');ai.type='text';ai.placeholder=t('appNamePh');ai.value=action.app_name||'';
       ai.addEventListener('input',function(){editActions[idx].app_name=this.value;});
       body.appendChild(ai);
     }
     else if(T==='OpenUrl'){
-      var ui=document.createElement('input');ui.type='text';ui.placeholder='URL模板，用 {text} 表示文字';ui.value=action.url_template||'';
+      var ui=document.createElement('input');ui.type='text';ui.placeholder=t('urlPh');ui.value=action.url_template||'';
       ui.addEventListener('input',function(){editActions[idx].url_template=this.value;});
       body.appendChild(ui);
-      var ht=document.createElement('span');ht.className='auto-label';ht.textContent='例: https://google.com/search?q={text}';
+      var ht=document.createElement('span');ht.className='auto-label';ht.textContent=t('urlExample');
       body.appendChild(ht);
     }
     else if(T==='Notification'){
-      var ni=document.createElement('input');ni.type='text';ni.placeholder='通知内容，支持 {text}，留空使用默认';ni.value=action.message||'';
+      var ni=document.createElement('input');ni.type='text';ni.placeholder=t('notifPh');ni.value=action.message||'';
       ni.addEventListener('input',function(){editActions[idx].message=this.value;});
       body.appendChild(ni);
     }
     else if(T==='WaitForWindow'){
-      var wi=document.createElement('input');wi.type='text';wi.placeholder='应用名称';wi.value=action.app_name||'';
+      var wi=document.createElement('input');wi.type='text';wi.placeholder=t('waitWindowAppPh');wi.value=action.app_name||'';
       wi.addEventListener('input',function(){editActions[idx].app_name=this.value;});
       body.appendChild(wi);
       var rw=document.createElement('div');rw.className='sub-row-inline';
-      var rl=document.createElement('span');rl.className='unit';rl.textContent='超时';
+      var rl=document.createElement('span');rl.className='unit';rl.textContent=t('timeout');
       var ti=document.createElement('input');ti.type='number';ti.value=action.timeout_ms||5000;ti.min=500;ti.step=500;ti.style.width='80px';ti.style.textAlign='center';
       ti.addEventListener('change',function(){editActions[idx].timeout_ms=parseInt(this.value)||5000;});
-      var rl2=document.createElement('span');rl2.className='unit';rl2.textContent='ms';
+      var rl2=document.createElement('span');rl2.className='unit';rl2.textContent=t('ms');
       rw.appendChild(rl);rw.appendChild(ti);rw.appendChild(rl2);
       body.appendChild(rw);
     }
     else if(T==='Assert'){
       var cond=action.condition||{type:'ForegroundApp',app_name:''};
       var cs=document.createElement('select');
-      CONDITION_TYPES.forEach(function(tp){
+      getConditionTypes().forEach(function(tp){
         var o=document.createElement('option');o.value=tp.v;o.textContent=tp.t;
         if(tp.v===cond.type)o.selected=true;cs.appendChild(o);
       });
@@ -861,32 +1198,32 @@
 
       var r=document.createElement('div');r.className='sub-row';
       if(cond.type==='ForegroundApp'){
-        var ai=document.createElement('input');ai.type='text';ai.placeholder='应用名称，如 Safari';ai.value=cond.app_name||'';
+        var ai=document.createElement('input');ai.type='text';ai.placeholder=t('appNamePh');ai.value=cond.app_name||'';
         ai.addEventListener('input',function(){editActions[idx].condition.app_name=this.value;});
         r.appendChild(ai);
       } else if(cond.type==='TextContains'||cond.type==='TextNotContains'){
-        var ki=document.createElement('input');ki.type='text';ki.placeholder='关键词';ki.value=cond.keyword||'';
+        var ki=document.createElement('input');ki.type='text';ki.placeholder=t('keywordPh');ki.value=cond.keyword||'';
         ki.addEventListener('input',function(){editActions[idx].condition.keyword=this.value;});
         r.appendChild(ki);
       } else if(cond.type==='TextStartsWith'){
-        var pi=document.createElement('input');pi.type='text';pi.placeholder='前缀';pi.value=cond.prefix||'';
+        var pi=document.createElement('input');pi.type='text';pi.placeholder=t('prefixPh');pi.value=cond.prefix||'';
         pi.addEventListener('input',function(){editActions[idx].condition.prefix=this.value;});
         r.appendChild(pi);
       } else if(cond.type==='TextEndsWith'){
-        var si=document.createElement('input');si.type='text';si.placeholder='后缀';si.value=cond.suffix||'';
+        var si=document.createElement('input');si.type='text';si.placeholder=t('suffixPh');si.value=cond.suffix||'';
         si.addEventListener('input',function(){editActions[idx].condition.suffix=this.value;});
         r.appendChild(si);
       } else if(cond.type==='TextMinLength'){
         var rw2=document.createElement('div');rw2.className='delay-wrap';
         var mi=document.createElement('input');mi.type='number';mi.value=cond.min||1;mi.min=1;
         mi.addEventListener('change',function(){editActions[idx].condition.min=parseInt(this.value)||1;});
-        var ul=document.createElement('span');ul.className='unit';ul.textContent='个字符';
+        var ul=document.createElement('span');ul.className='unit';ul.textContent=t('chars');
         rw2.appendChild(mi);rw2.appendChild(ul);r.appendChild(rw2);
       }
       body.appendChild(r);
 
       var ht=document.createElement('span');ht.className='auto-label';
-      ht.textContent='条件不满足时停止执行后续动作';
+      ht.textContent=t('assertFail');
       var sr=document.createElement('div');sr.className='sub-row';sr.appendChild(ht);
       body.appendChild(sr);
     }
@@ -900,7 +1237,7 @@
 
   // ─── Key Capture ───
   function setupKeyCapture(input,onCapture){
-    input.addEventListener('focus',function(){input.value='请按下快捷键...';input.classList.add('capturing');});
+    input.addEventListener('focus',function(){input.value=t('pressKeyCapturing');input.classList.add('capturing');});
     input.addEventListener('keydown',function(e){
       e.preventDefault();e.stopPropagation();
       var keys=[];
@@ -913,7 +1250,8 @@
       }
     });
     input.addEventListener('blur',function(){
-      input.classList.remove('capturing');if(input.value==='请按下快捷键...')input.value='';
+      var cap=t('pressKeyCapturing');
+      input.classList.remove('capturing');if(input.value===cap)input.value='';
     });
   }
   function normKey(k){
@@ -933,7 +1271,7 @@
   function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
   function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 
-  init().catch(function(e){log('FATAL: '+e.message+'\n'+(e.stack||''));showError('启动异常: '+e.message);});
+  init().catch(function(e){log('FATAL: '+e.message+'\n'+(e.stack||''));showError(t('loaderError')+e.message);});
 })();
 </script>
 </body>

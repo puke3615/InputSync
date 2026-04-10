@@ -59,7 +59,7 @@ async fn serve_info() -> Json<serde_json::Value> {
     let url = format!("http://{}:{}", state.local_ip, state.port);
     let qr = crate::qrcode_gen::generate_qr_data_url(&url).unwrap_or_default();
     Json(serde_json::json!({
-        "name": "InputSync",
+        "name": "TalkType",
         "ip": state.local_ip,
         "port": state.port,
         "url": url,
@@ -113,7 +113,7 @@ async fn handle_socket(socket: WebSocket) {
         .send(Message::Text(
             serde_json::json!({
                 "type": "connected",
-                "message": "已连接到电脑"
+                "message": "Connected to computer"
             })
             .to_string()
             .into(),
@@ -229,7 +229,7 @@ fn handle_text_message(msg: &serde_json::Value) {
 async fn serve_manifest() -> impl IntoResponse {
     (
         [("content-type", "application/manifest+json")],
-        r##"{"name":"InputSync","short_name":"InputSync","start_url":"/","display":"standalone","background_color":"#0f0f1a","theme_color":"#6366f1"}"##,
+        r##"{"name":"TalkType","short_name":"TalkType","description":"Speak on your phone, text appears on your computer. Voice input for vibe coding.","start_url":"/","display":"standalone","background_color":"#0f0f1a","theme_color":"#6366f1"}"##,
     )
 }
 

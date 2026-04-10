@@ -80,20 +80,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__
-          releaseName: 'InputSync v__VERSION__'
+          releaseName: 'TalkType v__VERSION__'
           releaseBody: |
-            InputSync v__VERSION__
+            ## TalkType v__VERSION__
 
-            ### 更新日志
-            * 将「忽略标点前缀」从同步文字动作迁移至文本转换，提升动作组合灵活性
-            * 导出场景改为系统文件选择对话框，用户可自由选择保存位置
-            * 精简内置场景为 2 个，并以 JSON 文件形式维护，便于后续扩展
+            > 🎙️ Speak on your phone → ⌨️ text appears on your computer → in any app.
+            > Global voice input for vibe coding.
 
-            ### 下载说明
-            - **macOS (Apple Silicon)**: 下载 `_aarch64.dmg` 文件
-            - **macOS (Intel)**: 下载 `_x64.dmg` 文件
-            - **Windows**: 下载 `.msi` 或 `.exe` 文件
-            - **Linux**: 下载 `.deb` 或 `.AppImage` 文件
+            ### What's New
+            * README 全面重写，英文优先，SEO 优化，对标竞品对比
+            * 桌面端 & 手机端文案优化，突出「语音输入」定位
+            * Manifest 增加 description 字段，提升 PWA 识别度
+
+            ### Download
+            | Platform | File |
+            |---|---|
+            | **macOS (Apple Silicon)** | `_aarch64.dmg` |
+            | **macOS (Intel)** | `_x64.dmg` |
+            | **Windows** | `.msi` or `.exe` |
+            | **Linux** | `.deb` or `.AppImage` |
           releaseDraft: true
           prerelease: false
           tauriScript: cargo tauri

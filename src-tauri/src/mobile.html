@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="/manifest.json">
-<title>InputSync</title>
+<title>TalkType</title>
 <style>
   :root {
     --primary: #6366f1;
@@ -63,6 +63,13 @@
     color: var(--text-muted); cursor: pointer; -webkit-appearance: none; transition: all 0.2s;
   }
   .icon-btn:active { transform: scale(0.92); background: var(--primary-glow); }
+  .lang-btn {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text-muted); cursor: pointer; -webkit-appearance: none; transition: all 0.2s;
+    font-size: 12px; font-weight: 700;
+  }
+  .lang-btn:active { transform: scale(0.92); background: var(--primary-glow); color: var(--primary-light); }
 
   .status-bar {
     flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -256,45 +263,50 @@
 <body>
 <div class="app">
   <div class="header">
-    <h1>InputSync</h1>
-    <button class="icon-btn" id="settingsBtn" aria-label="设置">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-    </button>
+    <h1 data-i18n="appName">TalkType</h1>
+    <div style="display:flex;gap:8px;">
+      <button type="button" class="lang-btn" id="langBtn">EN</button>
+      <button class="icon-btn" id="settingsBtn" data-i18n="settingsTitle" data-i18n-attr="aria-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
   </div>
 
   <div class="status-bar" id="statusBar">
     <div class="status-dot" id="statusDot"></div>
-    <span class="status-text" id="statusText">正在连接...</span>
+    <span class="status-text" id="statusText" data-i18n="connecting">Connecting...</span>
   </div>
 
   <div id="addHomeHint" class="add-home-hint" style="display:none;">
     <span>💡</span>
-    <span>添加到主屏幕，下次无需扫码直接打开</span>
+    <span data-i18n="addHomeHint">Add to Home Screen for instant access next time</span>
     <button class="dismiss" id="dismissHintBtn">✕</button>
   </div>
 
   <div class="mode-bar">
-    <button class="mode-btn active" id="modeBtnReplace" data-mode="replace">覆盖模式</button>
-    <button class="mode-btn" id="modeBtnAppend" data-mode="append">追加模式</button>
+    <button type="button" class="mode-btn active" id="modeBtnReplace" data-mode="replace" data-i18n="modeReplace">Replace Mode</button>
+    <button type="button" class="mode-btn" id="modeBtnAppend" data-mode="append" data-i18n="modeAppend">Append Mode</button>
   </div>
 
   <div class="scene-bar" id="sceneBar" style="display:none;">
-    <label>场景</label>
+    <label data-i18n="sceneLabel">Scene</label>
     <select class="scene-select" id="sceneSelect"></select>
   </div>
   <div id="sceneInfo" class="scene-info" style="display:none;"></div>
 
-  <div id="syncHint" class="sync-hint">输入内容将实时同步到电脑</div>
+  <div id="syncHint" class="sync-hint" data-i18n="syncHint">Speak or type, synced to your computer cursor in real time</div>
 
   <div class="input-card">
     <div class="label">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      输入内容
+      <span data-i18n="inputLabel">INPUT</span>
     </div>
     <textarea
       class="text-input"
       id="textInput"
-      placeholder="在这里输入文字，内容会实时同步到电脑..."
+      data-i18n="inputPh"
+      data-i18n-attr="placeholder"
+      placeholder="Tap here, speak or type — text appears on your computer..."
       autocomplete="off"
       autocapitalize="sentences"
       autocorrect="on"
@@ -306,8 +318,8 @@
   </div>
 
   <div class="bottom-actions">
-    <button class="btn btn-enter" id="enterBtn">↵ 回车</button>
-    <button class="btn btn-clear" id="clearBtn">清空</button>
+    <button type="button" class="btn btn-enter" id="enterBtn" data-i18n="enterBtn">↵ Enter</button>
+    <button type="button" class="btn btn-clear" id="clearBtn" data-i18n="clearBtn">Clear</button>
   </div>
 
   <div class="footer-info" id="footerInfo"></div>
@@ -316,19 +328,19 @@
 <div class="panel-overlay" id="panelOverlay"></div>
 <div class="side-panel" id="sidePanel">
   <div class="panel-header">
-    <h2>设置</h2>
-    <button class="panel-close" id="panelCloseBtn">✕</button>
+    <h2 data-i18n="settingsTitle">Settings</h2>
+    <button type="button" class="panel-close" id="panelCloseBtn">✕</button>
   </div>
   <div class="panel-section">
-    <div class="panel-section-title">连接记录</div>
+    <div class="panel-section-title" data-i18n="connRecords">CONNECTION HISTORY</div>
     <div id="connectionList"></div>
   </div>
   <div class="panel-section">
-    <div class="panel-section-title">关于</div>
-    <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-      InputSync v1.0<br>
-      局域网语音输入同步工具<br>
-      完全本地通信，无需云服务
+    <div class="panel-section-title" data-i18n="aboutTitle">ABOUT</div>
+    <div data-i18n="aboutDesc" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+      TalkType<br>
+      Speak to type · Phone voice to computer<br>
+      LAN only · Private &amp; Secure
     </div>
   </div>
 </div>
@@ -339,10 +351,165 @@
 (function() {
   'use strict';
 
-  var KEY_CONNECTIONS = 'is_connections';
-  var KEY_HOME_HINT = 'is_home_hint_dismissed';
-  var KEY_MODE = 'is_sync_mode';
-  var KEY_SCENE = 'is_active_scene';
+  (function migrateLsKeys() {
+    var map = [
+      ['is_connections', 'tt_connections'],
+      ['is_home_hint_dismissed', 'tt_home_hint_dismissed'],
+      ['is_sync_mode', 'tt_sync_mode'],
+      ['is_active_scene', 'tt_active_scene']
+    ];
+    map.forEach(function(pair) {
+      var oldK = pair[0];
+      var newK = pair[1];
+      try {
+        if (localStorage.getItem(oldK) !== null && localStorage.getItem(newK) === null) {
+          localStorage.setItem(newK, localStorage.getItem(oldK));
+          localStorage.removeItem(oldK);
+        }
+      } catch (e) {}
+    });
+  })();
+
+  var LANG = {
+    en: {
+      appName: 'TalkType',
+      connecting: 'Connecting...',
+      connected: 'Connected',
+      disconnected: 'Disconnected',
+      reconnecting: 'Reconnecting ({count})...',
+      cannotConnect: 'Cannot connect, check network',
+      connFailed: 'Connection failed',
+      addHomeHint: 'Add to Home Screen for instant access next time',
+      modeReplace: 'Replace Mode',
+      modeAppend: 'Append Mode',
+      sceneLabel: 'Scene',
+      syncHint: 'Speak or type, synced to your computer cursor in real time',
+      inputLabel: 'INPUT',
+      inputPh: 'Tap here, speak or type — text appears on your computer...',
+      enterBtn: '↵ Enter',
+      sendBtn: '▶ Send',
+      clearBtn: 'Clear',
+      cleared: 'Cleared',
+      sent: 'Sent',
+      triggered: 'Triggered: ',
+      synced: 'Synced ({count} chars)',
+      appended: 'Appended ({count} chars)',
+      connectedToast: 'Connected to computer',
+      autoSent: 'Auto-sent',
+      silenceInfo: 'Auto-trigger after {sec}s silence',
+      bufferMode: ' · Buffer mode',
+      hintReplace: 'Replace mode: phone content replaces computer input',
+      hintAppend: 'Append mode: new content appended at computer cursor',
+      hintBuffer: 'Buffer mode: all text sent on trigger',
+      settingsTitle: 'Settings',
+      connRecords: 'CONNECTION HISTORY',
+      noConnRecords: 'No connection records',
+      aboutTitle: 'ABOUT',
+      aboutDesc: 'TalkType\nSpeak to type · Phone voice to computer\nLAN only · Private & Secure',
+      current: 'Current',
+      saved: 'Saved',
+      justNow: 'Just now',
+      minsAgo: '{n} min ago',
+      hoursAgo: '{n}h ago',
+      daysAgo: '{n}d ago',
+      networkLabel: 'Subnet {net}.x',
+      unknownNetwork: 'Unknown network'
+    },
+    zh: {
+      appName: 'TalkType',
+      connecting: '正在连接...',
+      connected: '已连接',
+      disconnected: '连接断开',
+      reconnecting: '重连中 ({count})...',
+      cannotConnect: '无法连接，请检查网络',
+      connFailed: '连接失败',
+      addHomeHint: '添加到主屏幕，像 App 一样一键打开',
+      modeReplace: '覆盖模式',
+      modeAppend: '追加模式',
+      sceneLabel: '场景',
+      syncHint: '说话或打字，内容实时同步到电脑光标处',
+      inputLabel: '输入内容',
+      inputPh: '点击这里，用语音或键盘输入，文字实时出现在电脑上...',
+      enterBtn: '↵ 回车',
+      sendBtn: '▶ 发送',
+      clearBtn: '清空',
+      cleared: '已清空',
+      sent: '已发送',
+      triggered: '已触发: ',
+      synced: '已同步 ({count} 字)',
+      appended: '已追加 ({count} 字)',
+      connectedToast: '已连接到电脑',
+      autoSent: '已自动发送',
+      silenceInfo: '静默 {sec} 秒后自动触发',
+      bufferMode: ' · 文字暂存模式',
+      hintReplace: '覆盖模式：手机内容全量替换电脑输入框',
+      hintAppend: '追加模式：仅将新增内容追加到电脑光标处',
+      hintBuffer: '文字暂存模式：点击发送后统一同步',
+      settingsTitle: '设置',
+      connRecords: '连接记录',
+      noConnRecords: '暂无连接记录',
+      aboutTitle: '关于',
+      aboutDesc: 'TalkType\n说话即打字 · 手机语音输入到电脑\n纯局域网通信 · 隐私零泄露',
+      current: '当前',
+      saved: '历史',
+      justNow: '刚刚',
+      minsAgo: '{n}分前',
+      hoursAgo: '{n}小时前',
+      daysAgo: '{n}天前',
+      networkLabel: '网段 {net}.x',
+      unknownNetwork: '未知网络'
+    }
+  };
+
+  var storedLang = localStorage.getItem('tt_lang');
+  var currentLang = (storedLang === 'en' || storedLang === 'zh') ? storedLang : ((navigator.language && navigator.language.startsWith('zh')) ? 'zh' : 'en');
+
+  function t(key, params) {
+    var dict = LANG[currentLang] || LANG.en;
+    var str = dict[key] !== undefined ? dict[key] : (LANG.en[key] !== undefined ? LANG.en[key] : key);
+    if (params) {
+      Object.keys(params).forEach(function(k) {
+        str = str.split('{' + k + '}').join(String(params[k]));
+      });
+    }
+    return str;
+  }
+
+  function applyI18n() {
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+    document.title = t('appName');
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      var attr = el.getAttribute('data-i18n-attr');
+      if (key === 'aboutDesc') {
+        el.innerHTML = t('aboutDesc').replace(/\n/g, '<br>');
+        return;
+      }
+      var val = t(key);
+      if (attr) {
+        el.setAttribute(attr, val);
+      } else {
+        el.textContent = val;
+      }
+    });
+    var langBtn = document.getElementById('langBtn');
+    if (langBtn) {
+      langBtn.textContent = currentLang === 'zh' ? 'EN' : '中';
+    }
+    refreshStatusFromKey();
+    updateSyncHintText();
+    updateSceneInfo();
+    updateEnterButton();
+    refreshFooterHostLine();
+    if (document.getElementById('sidePanel').classList.contains('visible')) {
+      renderConnections();
+    }
+  }
+
+  var KEY_CONNECTIONS = 'tt_connections';
+  var KEY_HOME_HINT = 'tt_home_hint_dismissed';
+  var KEY_MODE = 'tt_sync_mode';
+  var KEY_SCENE = 'tt_active_scene';
 
   var ws = null;
   var connected = false;
@@ -352,6 +519,27 @@
   var lastSyncedText = '';
   var composing = false;
   var syncMode = load(KEY_MODE) || 'replace';
+
+  var currentStatusKey = 'connecting';
+  var currentStatusParams = null;
+
+  function setStatus(key, params) {
+    currentStatusKey = key;
+    currentStatusParams = params;
+    if (key === 'reconnecting') {
+      statusText.textContent = t('reconnecting', { count: reconnectAttempts });
+      return;
+    }
+    statusText.textContent = params ? t(key, params) : t(key);
+  }
+
+  function refreshStatusFromKey() {
+    if (currentStatusKey === 'reconnecting') {
+      statusText.textContent = t('reconnecting', { count: reconnectAttempts });
+      return;
+    }
+    statusText.textContent = currentStatusParams ? t(currentStatusKey, currentStatusParams) : t(currentStatusKey);
+  }
 
   // Scene state
   var scenes = [];
@@ -370,12 +558,19 @@
   function init() {
     applyMode(syncMode);
     bindEvents();
+    applyI18n();
     connectWS();
     saveConnection();
     showHomeHint();
   }
 
   function bindEvents() {
+    document.getElementById('langBtn').addEventListener('click', function() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      try { localStorage.setItem('tt_lang', currentLang); } catch (e) {}
+      applyI18n();
+    });
+
     textInput.addEventListener('input', function() {
       charCount.textContent = textInput.value.length;
       if (!composing) {
@@ -419,7 +614,7 @@
       if (connected && syncMode === 'replace' && isRealtimeSync()) {
         ws.send(JSON.stringify({ type: 'sync', text: '' }));
       }
-      showSyncHint('已清空');
+      showSyncHint(t('cleared'));
     });
 
     document.getElementById('modeBtnReplace').addEventListener('click', function() { applyMode('replace'); });
@@ -480,7 +675,7 @@
       charCount.textContent = '0';
       lastSyncedText = '';
       sentTextEnd = 0;
-      showSyncHint('已触发: ' + activeScene.name);
+      showSyncHint(t('triggered') + activeScene.name);
       return;
     }
 
@@ -492,7 +687,7 @@
     charCount.textContent = '0';
     lastSyncedText = '';
     sentTextEnd = 0;
-    showSyncHint('已发送');
+    showSyncHint(t('sent'));
   }
 
   // ─── Mode ───
@@ -508,12 +703,10 @@
 
   function updateSyncHintText() {
     if (!isRealtimeSync()) {
-      document.getElementById('syncHint').textContent = '文字暂存模式：点击发送后统一同步';
+      document.getElementById('syncHint').textContent = t('hintBuffer');
       return;
     }
-    var hint = syncMode === 'replace'
-      ? '覆盖模式：手机内容全量替换电脑输入框'
-      : '追加模式：仅将新增内容追加到电脑光标处';
+    var hint = syncMode === 'replace' ? t('hintReplace') : t('hintAppend');
     document.getElementById('syncHint').textContent = hint;
   }
 
@@ -574,9 +767,9 @@
     var info = activeScene.description || '';
     if (activeScene.trigger && activeScene.trigger.type === 'Silence') {
       var sec = (activeScene.trigger.timeout_ms / 1000).toFixed(1).replace(/\.0$/, '');
-      info = '静默 ' + sec + ' 秒后自动触发';
+      info = t('silenceInfo', { sec: sec });
       if (!activeScene.realtime_sync) {
-        info += ' · 文字暂存模式';
+        info += t('bufferMode');
       }
     }
 
@@ -594,9 +787,9 @@
   function updateEnterButton() {
     var btn = document.getElementById('enterBtn');
     if (activeScene && activeScene.actions && activeScene.actions.length > 0) {
-      btn.textContent = '▶ 发送';
+      btn.textContent = t('sendBtn');
     } else {
-      btn.innerHTML = '↵ 回车';
+      btn.textContent = t('enterBtn');
     }
   }
 
@@ -626,8 +819,8 @@
     ws.send(JSON.stringify({ type: 'trigger_scene', text: textToSend }));
     sentTextEnd = textInput.value.length;
 
-    showSyncHint('已触发: ' + activeScene.name);
-    toast('已自动发送');
+    showSyncHint(t('triggered') + activeScene.name);
+    toast(t('autoSent'));
   }
 
   // ─── Real-time Sync ───
@@ -654,13 +847,13 @@
           text.substring(0, lastSyncedText.length) === lastSyncedText) {
         var delta = text.substring(lastSyncedText.length);
         ws.send(JSON.stringify({ type: 'input', text: delta }));
-        showSyncHint('已追加 (' + delta.length + ' 字)');
+        showSyncHint(t('appended', { count: delta.length }));
       }
       lastSyncedText = text;
     } else {
       lastSyncedText = text;
       ws.send(JSON.stringify({ type: 'sync', text: text }));
-      showSyncHint('已同步 (' + text.length + ' 字)');
+      showSyncHint(t('synced', { count: text.length }));
     }
   }
 
@@ -670,7 +863,7 @@
     clearTimeout(syncHint._t);
     syncHint._t = setTimeout(function() {
       syncHint.classList.remove('active');
-      syncHint.textContent = '输入内容将实时同步到电脑';
+      syncHint.textContent = t('syncHint');
     }, 1500);
   }
 
@@ -683,11 +876,11 @@
 
   function connectWS() {
     if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
-    statusText.textContent = '正在连接...';
+    setStatus('connecting');
     try {
       ws = new WebSocket(getWsUrl());
     } catch (e) {
-      statusText.textContent = '连接失败';
+      setStatus('connFailed');
       scheduleReconnect();
       return;
     }
@@ -696,8 +889,8 @@
       connected = true;
       reconnectAttempts = 0;
       statusDot.classList.add('connected');
-      statusText.textContent = '已连接';
-      toast('已连接到电脑');
+      setStatus('connected');
+      toast(t('connectedToast'));
       updateConnectionStatus(true);
 
       // Re-send active scene after reconnect
@@ -722,7 +915,7 @@
     ws.onclose = function() {
       connected = false;
       statusDot.classList.remove('connected');
-      statusText.textContent = '连接断开';
+      setStatus('disconnected');
       updateConnectionStatus(false);
       clearTimeout(silenceTimer);
       scheduleReconnect();
@@ -737,13 +930,15 @@
   function scheduleReconnect() {
     if (reconnectTimer) clearTimeout(reconnectTimer);
     if (reconnectAttempts >= 200) {
-      statusText.textContent = '无法连接，请检查网络';
+      setStatus('cannotConnect');
       return;
     }
     var delay = Math.min(1000 * Math.pow(1.3, reconnectAttempts), 8000);
     reconnectAttempts++;
     reconnectTimer = setTimeout(function() {
-      statusText.textContent = '重连中 (' + reconnectAttempts + ')...';
+      currentStatusKey = 'reconnecting';
+      currentStatusParams = null;
+      statusText.textContent = t('reconnecting', { count: reconnectAttempts });
       connectWS();
     }, delay);
   }
@@ -779,6 +974,17 @@
     } catch (e) {}
   }
 
+  function refreshFooterHostLine() {
+    try {
+      var conns = load(KEY_CONNECTIONS) || [];
+      var idx = conns.findIndex(function(c) { return c.host === location.host; });
+      if (idx >= 0) {
+        var cur = conns[idx];
+        document.getElementById('footerInfo').textContent = cur.host + ' · ' + getNetworkLabel(cur.network);
+      }
+    } catch (e) {}
+  }
+
   function updateConnectionStatus(isConnected) {
     try {
       var conns = load(KEY_CONNECTIONS) || [];
@@ -795,7 +1001,7 @@
     var conns = load(KEY_CONNECTIONS) || [];
     var list = document.getElementById('connectionList');
     if (!conns.length) {
-      list.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">暂无连接记录</div>';
+      list.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">' + esc(t('noConnRecords')) + '</div>';
       return;
     }
     var groups = {};
@@ -807,17 +1013,17 @@
     var html = '';
     Object.keys(groups).forEach(function(net) {
       html += '<div style="font-size:11px;color:var(--text-muted);margin:8px 0 4px;font-weight:600;">' +
-              getNetworkLabel(net) + '</div>';
+              esc(getNetworkLabel(net)) + '</div>';
       groups[net].forEach(function(c) {
         var isCurrent = c.host === location.host;
         html += '<div class="conn-item' + (isCurrent ? ' current' : '') + '" data-url="' + esc(c.url) + '">' +
           '<div class="conn-icon">' + (isCurrent ? '🟢' : '📡') + '</div>' +
           '<div class="conn-info">' +
             '<div class="conn-host">' + esc(c.host) + '</div>' +
-            '<div class="conn-meta">' + timeAgo(c.lastSeen) + '</div>' +
+            '<div class="conn-meta">' + esc(timeAgo(c.lastSeen)) + '</div>' +
           '</div>' +
           '<span class="conn-badge ' + (isCurrent ? 'active' : 'saved') + '">' +
-            (isCurrent ? '当前' : '历史') +
+            esc(isCurrent ? t('current') : t('saved')) +
           '</span></div>';
       });
     });
@@ -841,8 +1047,8 @@
   }
 
   function getNetworkLabel(netId) {
-    if (!netId || netId === 'unknown') return '未知网络';
-    return '网段 ' + netId + '.x';
+    if (!netId || netId === 'unknown') return t('unknownNetwork');
+    return t('networkLabel', { net: netId });
   }
 
   // ─── Home Screen Hint ───
@@ -864,19 +1070,19 @@
   // ─── Utils ───
 
   function toast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function() { t.classList.remove('show'); }, 1400);
+    var toastEl = document.getElementById('toast');
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._timer);
+    toastEl._timer = setTimeout(function() { toastEl.classList.remove('show'); }, 1400);
   }
 
   function timeAgo(ts) {
     var d = Date.now() - ts;
-    if (d < 60000) return '刚刚';
-    if (d < 3600000) return Math.floor(d / 60000) + '分前';
-    if (d < 86400000) return Math.floor(d / 3600000) + '小时前';
-    return Math.floor(d / 86400000) + '天前';
+    if (d < 60000) return t('justNow');
+    if (d < 3600000) return t('minsAgo', { n: Math.floor(d / 60000) });
+    if (d < 86400000) return t('hoursAgo', { n: Math.floor(d / 3600000) });
+    return t('daysAgo', { n: Math.floor(d / 86400000) });
   }
 
   function esc(s) {

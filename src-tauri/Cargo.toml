@@ -1,14 +1,14 @@
 [package]
-name = "input-sync"
+name = "talk-type"
 version = "1.5.0"
 edition = "2021"
 
 [lib]
-name = "input_sync_lib"
+name = "talk_type_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [[bin]]
-name = "input-sync"
+name = "talk-type"
 path = "src/main.rs"
 
 [dependencies]
