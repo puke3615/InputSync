@@ -17,6 +17,14 @@ impl Default for AppConfig {
     }
 }
 
+pub fn config_dir_path() -> PathBuf {
+    let dir = config_dir();
+    if !dir.exists() {
+        let _ = std::fs::create_dir_all(&dir);
+    }
+    dir
+}
+
 fn config_dir() -> PathBuf {
     #[cfg(target_os = "windows")]
     {

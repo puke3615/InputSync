@@ -372,6 +372,10 @@
           <button class="btn-import-scene" id="importSceneBtn" data-i18n="importScene"></button>
         </div>
       </div>
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="generalSettings"></div>
+        <button class="btn-import-scene" id="openConfigDirBtn" data-i18n="openConfigDir" style="width:100%;"></button>
+      </div>
     </div>
   </div>
 </div>
@@ -554,7 +558,9 @@
       actionMoveUp: 'Move up',
       actionMoveDown: 'Move down',
       actionDel: 'Remove',
-      waitWindowAppPh: 'App name'
+      waitWindowAppPh: 'App name',
+      generalSettings: 'GENERAL',
+      openConfigDir: '📂 Open Config Directory'
     },
     zh: {
       appName: 'TalkType',
@@ -672,7 +678,9 @@
       actionMoveUp: '上移',
       actionMoveDown: '下移',
       actionDel: '删除',
-      waitWindowAppPh: '应用名称'
+      waitWindowAppPh: '应用名称',
+      generalSettings: '通用设置',
+      openConfigDir: '📂 打开配置目录'
     }
   };
 
@@ -860,6 +868,10 @@
     if(!invoke)return;try{var ok=await invoke('check_accessibility');document.getElementById('permBox').style.display=ok?'none':'';}catch(e){}
   });
 
+  document.getElementById('openConfigDirBtn').addEventListener('click',function(){
+    if(invoke) invoke('open_config_dir').catch(function(e){ log('Open config dir failed: '+e); });
+  });
+
   // ─── Scene List ───
   document.getElementById('addSceneBtn').addEventListener('click',function(){openEditor(null);});
 
@@ -888,7 +900,7 @@
   }
 
   function sceneIcon(s){
-    if(s.id==='default')return'📡';if(s.id==='send-message')return'💬';return'⚡';
+    if(s.id==='default'||s.id==='real-time-sync')return'📡';return'⚡';
   }
 
   // ─── Import / Export ───

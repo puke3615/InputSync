@@ -725,9 +725,7 @@
       opt.textContent = s.name;
       sel.appendChild(opt);
     });
-    if (scenes.length > 0) {
-      document.getElementById('sceneBar').style.display = '';
-    }
+    document.getElementById('sceneBar').style.display = scenes.length > 1 ? '' : 'none';
   }
 
   function selectScene(sceneId) {

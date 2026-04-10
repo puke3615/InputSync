@@ -21,8 +21,11 @@
   <a href="#-快速开始">快速开始</a> •
   <a href="#-核心特性">核心特性</a> •
   <a href="#-为什么选-talktype">对比</a> •
-  <a href="#-下载安装">下载</a> •
-  <a href="README.md">English</a>
+  <a href="#-下载安装">下载</a>
+</p>
+
+<p align="center">
+  <a href="README.md">English</a> | <b>中文</b>
 </p>
 
 ---

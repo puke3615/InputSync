@@ -366,9 +366,7 @@ fn set_clipboard(text: &str) {
 pub fn default_scenes() -> Vec<Scene> {
     let s1: Scene = serde_json::from_str(include_str!("../scenes/real-time-sync.json"))
         .expect("Failed to parse real-time-sync.json");
-    let s2: Scene = serde_json::from_str(include_str!("../scenes/send-message.json"))
-        .expect("Failed to parse send-message.json");
-    vec![s1, s2]
+    vec![s1]
 }
 
 // ─── Scene store ───

@@ -82,6 +82,33 @@ fn open_accessibility_settings() {
 }
 
 #[tauri::command]
+fn open_config_dir() -> Result<(), String> {
+    let dir = config::config_dir_path();
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&dir)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(&dir)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&dir)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
 fn get_scenes() -> Vec<scene::Scene> {
     scene::get_scenes()
 }
@@ -180,6 +207,7 @@ pub fn run() {
             generate_qr,
             check_accessibility,
             open_accessibility_settings,
+            open_config_dir,
             get_scenes,
             save_scene,
             delete_scene,

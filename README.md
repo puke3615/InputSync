@@ -21,8 +21,11 @@
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-features">Features</a> •
   <a href="#-why-talktype">Comparison</a> •
-  <a href="#-download">Download</a> •
-  <a href="README_CN.md">中文文档</a>
+  <a href="#-download">Download</a>
+</p>
+
+<p align="center">
+  <b>English</b> | <a href="README_CN.md">中文</a>
 </p>
 
 ---
