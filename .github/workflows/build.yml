@@ -114,9 +114,20 @@ jobs:
             > Global voice input for vibe coding.
 
             ### What's New
-            * README 全面重写，英文优先，SEO 优化，对标竞品对比
-            * 桌面端 & 手机端文案优化，突出「语音输入」定位
-            * Manifest 增加 description 字段，提升 PWA 识别度
+            * Renamed project (InputSync → TalkType), full i18n support (CN→EN UI)
+            * Refreshed app icons across all platforms
+            * Added "Open Config Directory" feature
+            * Major README rewrite; added Chinese README (README_CN.md)
+            * CI build workflow optimizations (path-based trigger filters)
+            * Desktop & mobile UX improvements
+
+            ### 更新内容
+            * 项目重命名（InputSync → TalkType），全面国际化支持（中文 → 英文 UI）
+            * 全平台应用图标优化
+            * 新增「打开配置目录」功能
+            * README 全面重写，新增中文版 README_CN.md
+            * CI 构建流程优化（基于路径的触发过滤）
+            * 桌面端 & 手机端体验优化
 
             ### Download
             | Platform | File |
