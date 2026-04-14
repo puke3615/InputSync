@@ -26,13 +26,12 @@
     --danger: #f87171;
     --border: rgba(99, 102, 241, 0.15);
     --radius: 16px;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; height: -webkit-fill-available; }
   body {
-    min-height: 100%; min-height: -webkit-fill-available;
+    height: 100%; height: -webkit-fill-available;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
     background-image:
@@ -43,112 +42,110 @@
   }
 
   .app {
-    display: flex; flex-direction: column; height: 100%;
+    display: flex; flex-direction: column;
+    height: 100%; height: 100dvh;
     max-width: 500px; margin: 0 auto;
     padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 0px) 16px;
   }
 
+  /* ─── Header ─── */
   .header {
-    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 0 8px;
+    flex-shrink: 0; display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center; padding: 14px 0 4px;
   }
   .header h1 {
     font-size: 20px; font-weight: 800;
     background: linear-gradient(135deg, #c4b5fd, var(--primary), #818cf8);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
+  .header-status {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--danger);
+    flex-shrink: 0; transition: all 0.4s;
+  }
+  .status-dot.connected {
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success-glow);
+    animation: glow 2.5s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 6px var(--success-glow); }
+    50% { box-shadow: 0 0 12px var(--success-glow), 0 0 18px var(--success-glow); }
+  }
+  .status-label { font-size: 11px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+  .header-right { display: flex; align-items: center; gap: 8px; justify-self: end; }
   .icon-btn {
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
     color: var(--text-muted); cursor: pointer; -webkit-appearance: none; transition: all 0.2s;
   }
   .icon-btn:active { transform: scale(0.92); background: var(--primary-glow); }
   .lang-btn {
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
     color: var(--text-muted); cursor: pointer; -webkit-appearance: none; transition: all 0.2s;
     font-size: 12px; font-weight: 700;
   }
   .lang-btn:active { transform: scale(0.92); background: var(--primary-glow); color: var(--primary-light); }
 
-  .status-bar {
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 8px 16px; background: var(--bg-card); border-radius: 10px; margin-bottom: 10px;
-    border: 1px solid var(--border);
+  /* ─── Home Hint ─── */
+  .add-home-hint {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    background: var(--primary-glow); border: 1px solid var(--border); border-radius: 10px;
+    font-size: 12px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;
+    flex-shrink: 0;
   }
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--danger);
-    flex-shrink: 0; transition: all 0.4s;
-  }
-  .status-dot.connected {
-    background: var(--success);
-    box-shadow: 0 0 8px var(--success-glow), 0 0 16px var(--success-glow);
-    animation: glow 2.5s ease-in-out infinite;
-  }
-  @keyframes glow {
-    0%, 100% { box-shadow: 0 0 8px var(--success-glow); }
-    50% { box-shadow: 0 0 16px var(--success-glow), 0 0 24px var(--success-glow); }
-  }
-  .status-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-
-  .mode-bar {
-    flex-shrink: 0; display: flex; gap: 0; margin-bottom: 8px;
-    background: var(--bg-card); border-radius: 10px; padding: 3px;
-    border: 1px solid var(--border);
-  }
-  .mode-btn {
-    flex: 1; padding: 6px 0; font-size: 12px; font-weight: 600;
-    color: var(--text-muted); background: transparent; border: none;
-    border-radius: 8px; cursor: pointer; transition: all 0.2s;
-    -webkit-appearance: none; touch-action: manipulation;
-  }
-  .mode-btn.active {
-    background: var(--primary); color: #fff;
-    box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+  .add-home-hint .dismiss {
+    margin-left: auto; background: none; border: none; color: var(--text-muted);
+    font-size: 16px; cursor: pointer; padding: 4px; -webkit-appearance: none;
   }
 
-  .scene-bar {
-    flex-shrink: 0; display: flex; align-items: center; gap: 8px;
-    margin-bottom: 6px; padding: 0 2px;
+  /* ─── Toolbar ─── */
+  .toolbar {
+    flex-shrink: 0; display: flex; align-items: center;
+    padding: 8px 0 6px; justify-content: space-between;
   }
-  .scene-bar label {
-    font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap;
+  .toggle-label {
+    font-size: 13px; color: var(--text-muted); font-weight: 500;
   }
-  .scene-select {
-    flex: 1; padding: 7px 28px 7px 10px; font-size: 13px; font-weight: 500;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text); -webkit-appearance: none; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3c0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 10px center; background-size: 12px;
-    cursor: pointer; outline: none;
+  .toggle-switch {
+    position: relative; display: inline-block;
+    width: 44px; height: 24px; flex-shrink: 0;
   }
-  .scene-select:focus { border-color: var(--primary); }
-  .scene-select option { background: #1e1e3a; color: var(--text); }
+  .toggle-switch input {
+    opacity: 0; width: 0; height: 0; position: absolute;
+  }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: rgba(255,255,255,0.15); border-radius: 24px;
+    transition: background 0.3s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute;
+    width: 20px; height: 20px; left: 2px; bottom: 2px;
+    background: #fff; border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .toggle-switch input:checked + .toggle-slider {
+    background: var(--primary);
+  }
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+  }
 
-  .scene-info {
-    flex-shrink: 0; text-align: center; font-size: 11px; color: var(--text-muted);
-    opacity: 0.6; margin-bottom: 6px; transition: all 0.2s;
-  }
-  .scene-info.active { opacity: 1; color: var(--primary-light); }
-
-  .sync-hint {
-    flex-shrink: 0; text-align: center; font-size: 11px; color: var(--text-muted);
-    opacity: 0.5; margin-bottom: 8px;
-  }
-  .sync-hint.active { opacity: 1; color: var(--success); }
-
+  /* ─── Input Card ─── */
   .input-card {
     flex: 1; display: flex; flex-direction: column;
     background: var(--bg-card); border-radius: var(--radius); padding: 12px;
-    border: 1px solid var(--border); min-height: 0; margin-bottom: 10px;
-  }
-  .input-card .label {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--text-muted); margin-bottom: 8px;
-    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1px solid var(--border); min-height: 0;
+    overflow: hidden;
   }
   .text-input {
-    flex: 1; width: 100%; min-height: 120px;
+    flex: 1; width: 100%; min-height: 80px;
     padding: 12px 14px; background: var(--bg-input);
     border: 1.5px solid var(--border); border-radius: 12px;
     color: var(--text); font-size: 16px; line-height: 1.6; resize: none; outline: none;
@@ -157,44 +154,36 @@
   }
   .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
   .text-input::placeholder { color: var(--text-muted); opacity: 0.5; }
+  .textarea-wrap {
+    position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0;
+  }
+  .input-clear {
+    position: absolute; top: 6px; right: 6px;
+    width: 18px; height: 18px;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.3); border: none; border-radius: 50%;
+    color: var(--text-muted);
+    cursor: pointer; -webkit-appearance: none;
+    z-index: 1; transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  .input-clear:active {
+    background: rgba(248,113,113,0.2); color: var(--danger);
+    transform: scale(0.9);
+  }
+  .input-clear.visible { display: flex; }
   .char-count {
     text-align: right; font-size: 11px; color: var(--text-muted); opacity: 0.4;
-    margin-top: 4px; font-variant-numeric: tabular-nums;
+    margin-top: 4px; font-variant-numeric: tabular-nums; flex-shrink: 0;
   }
 
-  .bottom-actions {
-    flex-shrink: 0; display: flex; gap: 8px; margin-bottom: 8px;
-  }
-  .btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s; -webkit-appearance: none; touch-action: manipulation;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-enter {
-    background: var(--bg-card); color: var(--text); border: 1px solid var(--border);
-  }
-  .btn-enter:active { border-color: var(--primary); background: var(--primary-glow); }
-  .btn-clear {
-    background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); flex: 0.6;
-  }
-  .btn-clear:active { border-color: var(--danger); background: rgba(248,113,113,0.1); color: var(--danger); }
-
+  /* ─── Footer ─── */
   .footer-info {
-    flex-shrink: 0; text-align: center; padding: 4px;
+    flex-shrink: 0; text-align: center; padding: 6px 0 4px;
     font-size: 11px; color: var(--text-muted); opacity: 0.3;
   }
 
-  .add-home-hint {
-    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-    background: var(--primary-glow); border: 1px solid var(--border); border-radius: 10px;
-    font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;
-  }
-  .add-home-hint .dismiss {
-    margin-left: auto; background: none; border: none; color: var(--text-muted);
-    font-size: 16px; cursor: pointer; padding: 4px; -webkit-appearance: none;
-  }
-
+  /* ─── Toast ─── */
   .toast {
     position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.85);
@@ -205,7 +194,7 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-  /* Settings Panel */
+  /* ─── Settings Panel ─── */
   .panel-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100;
   }
@@ -240,7 +229,7 @@
   }
 
   .conn-item {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
     background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border);
     margin-bottom: 6px; cursor: pointer; transition: all 0.15s;
   }
@@ -252,29 +241,32 @@
   }
   .conn-info { flex: 1; min-width: 0; }
   .conn-host { font-size: 13px; font-weight: 600; font-family: 'SF Mono', monospace; }
-  .conn-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .conn-meta {
+    font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
   .conn-badge {
-    font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; flex-shrink: 0;
+    font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 600; flex-shrink: 0;
   }
   .conn-badge.active { background: var(--success-glow); color: var(--success); }
   .conn-badge.saved { background: var(--primary-glow); color: var(--primary-light); }
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
+
   <div class="header">
     <h1 data-i18n="appName">TalkType</h1>
-    <div style="display:flex;gap:8px;">
+    <div class="header-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusText" data-i18n="connecting">Connecting...</span>
+    </div>
+    <div class="header-right">
       <button type="button" class="lang-btn" id="langBtn">EN</button>
       <button class="icon-btn" id="settingsBtn" data-i18n="settingsTitle" data-i18n-attr="aria-label">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
-  </div>
-
-  <div class="status-bar" id="statusBar">
-    <div class="status-dot" id="statusDot"></div>
-    <span class="status-text" id="statusText" data-i18n="connecting">Connecting...</span>
   </div>
 
   <div id="addHomeHint" class="add-home-hint" style="display:none;">
@@ -283,43 +275,35 @@
     <button class="dismiss" id="dismissHintBtn">✕</button>
   </div>
 
-  <div class="mode-bar">
-    <button type="button" class="mode-btn active" id="modeBtnReplace" data-mode="replace" data-i18n="modeReplace">Replace Mode</button>
-    <button type="button" class="mode-btn" id="modeBtnAppend" data-mode="append" data-i18n="modeAppend">Append Mode</button>
+  <div class="toolbar">
+    <span class="toggle-label" data-i18n="autoEnterLabel">Auto-Enter on done</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="autoEnterCb" checked>
+      <span class="toggle-slider"></span>
+    </label>
   </div>
-
-  <div class="scene-bar" id="sceneBar" style="display:none;">
-    <label data-i18n="sceneLabel">Scene</label>
-    <select class="scene-select" id="sceneSelect"></select>
-  </div>
-  <div id="sceneInfo" class="scene-info" style="display:none;"></div>
-
-  <div id="syncHint" class="sync-hint" data-i18n="syncHint">Speak or type, synced to your computer cursor in real time</div>
 
   <div class="input-card">
-    <div class="label">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span data-i18n="inputLabel">INPUT</span>
+    <div class="textarea-wrap">
+      <textarea
+        class="text-input"
+        id="textInput"
+        data-i18n="inputPh"
+        data-i18n-attr="placeholder"
+        placeholder="Tap here, speak or type..."
+        autocomplete="off"
+        autocapitalize="sentences"
+        autocorrect="on"
+        spellcheck="false"
+        inputmode="text"
+        enterkeyhint="done"
+        autofocus
+      ></textarea>
+      <button type="button" class="input-clear" id="inputClearBtn" aria-label="Clear">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <textarea
-      class="text-input"
-      id="textInput"
-      data-i18n="inputPh"
-      data-i18n-attr="placeholder"
-      placeholder="Tap here, speak or type — text appears on your computer..."
-      autocomplete="off"
-      autocapitalize="sentences"
-      autocorrect="on"
-      spellcheck="false"
-      inputmode="text"
-      enterkeyhint="send"
-    ></textarea>
     <div class="char-count" id="charCount">0</div>
-  </div>
-
-  <div class="bottom-actions">
-    <button type="button" class="btn btn-enter" id="enterBtn" data-i18n="enterBtn">↵ Enter</button>
-    <button type="button" class="btn btn-clear" id="clearBtn" data-i18n="clearBtn">Clear</button>
   </div>
 
   <div class="footer-info" id="footerInfo"></div>
@@ -352,19 +336,11 @@
   'use strict';
 
   (function migrateLsKeys() {
-    var map = [
-      ['is_connections', 'tt_connections'],
-      ['is_home_hint_dismissed', 'tt_home_hint_dismissed'],
-      ['is_sync_mode', 'tt_sync_mode'],
-      ['is_active_scene', 'tt_active_scene']
-    ];
-    map.forEach(function(pair) {
-      var oldK = pair[0];
-      var newK = pair[1];
+    [['is_connections','tt_connections'],['is_home_hint_dismissed','tt_home_hint_dismissed']].forEach(function(p) {
       try {
-        if (localStorage.getItem(oldK) !== null && localStorage.getItem(newK) === null) {
-          localStorage.setItem(newK, localStorage.getItem(oldK));
-          localStorage.removeItem(oldK);
+        if (localStorage.getItem(p[0]) !== null && localStorage.getItem(p[1]) === null) {
+          localStorage.setItem(p[1], localStorage.getItem(p[0]));
+          localStorage.removeItem(p[0]);
         }
       } catch (e) {}
     });
@@ -377,30 +353,14 @@
       connected: 'Connected',
       disconnected: 'Disconnected',
       reconnecting: 'Reconnecting ({count})...',
-      cannotConnect: 'Cannot connect, check network',
-      connFailed: 'Connection failed',
+      cannotConnect: 'Cannot connect',
+      connFailed: 'Failed',
       addHomeHint: 'Add to Home Screen for instant access next time',
-      modeReplace: 'Replace Mode',
-      modeAppend: 'Append Mode',
-      sceneLabel: 'Scene',
-      syncHint: 'Speak or type, synced to your computer cursor in real time',
-      inputLabel: 'INPUT',
-      inputPh: 'Tap here, speak or type — text appears on your computer...',
-      enterBtn: '↵ Enter',
-      sendBtn: '▶ Send',
-      clearBtn: 'Clear',
+      inputPh: 'Tap here, speak or type...',
       cleared: 'Cleared',
-      sent: 'Sent',
-      triggered: 'Triggered: ',
-      synced: 'Synced ({count} chars)',
-      appended: 'Appended ({count} chars)',
+      synced: 'Synced ✓',
       connectedToast: 'Connected to computer',
-      autoSent: 'Auto-sent',
-      silenceInfo: 'Auto-trigger after {sec}s silence',
-      bufferMode: ' · Buffer mode',
-      hintReplace: 'Replace mode: phone content replaces computer input',
-      hintAppend: 'Append mode: new content appended at computer cursor',
-      hintBuffer: 'Buffer mode: all text sent on trigger',
+      autoEnterLabel: 'Auto-Enter on done',
       settingsTitle: 'Settings',
       connRecords: 'CONNECTION HISTORY',
       noConnRecords: 'No connection records',
@@ -417,34 +377,18 @@
     },
     zh: {
       appName: 'TalkType',
-      connecting: '正在连接...',
+      connecting: '连接中...',
       connected: '已连接',
-      disconnected: '连接断开',
+      disconnected: '已断开',
       reconnecting: '重连中 ({count})...',
-      cannotConnect: '无法连接，请检查网络',
+      cannotConnect: '无法连接',
       connFailed: '连接失败',
       addHomeHint: '添加到主屏幕，像 App 一样一键打开',
-      modeReplace: '覆盖模式',
-      modeAppend: '追加模式',
-      sceneLabel: '场景',
-      syncHint: '说话或打字，内容实时同步到电脑光标处',
-      inputLabel: '输入内容',
-      inputPh: '点击这里，用语音或键盘输入，文字实时出现在电脑上...',
-      enterBtn: '↵ 回车',
-      sendBtn: '▶ 发送',
-      clearBtn: '清空',
+      inputPh: '点击这里，用语音或键盘输入...',
       cleared: '已清空',
-      sent: '已发送',
-      triggered: '已触发: ',
-      synced: '已同步 ({count} 字)',
-      appended: '已追加 ({count} 字)',
+      synced: '已同步 ✓',
       connectedToast: '已连接到电脑',
-      autoSent: '已自动发送',
-      silenceInfo: '静默 {sec} 秒后自动触发',
-      bufferMode: ' · 文字暂存模式',
-      hintReplace: '覆盖模式：手机内容全量替换电脑输入框',
-      hintAppend: '追加模式：仅将新增内容追加到电脑光标处',
-      hintBuffer: '文字暂存模式：点击发送后统一同步',
+      autoEnterLabel: '完成时自动回车',
       settingsTitle: '设置',
       connRecords: '连接记录',
       noConnRecords: '暂无连接记录',
@@ -486,42 +430,34 @@
         return;
       }
       var val = t(key);
-      if (attr) {
-        el.setAttribute(attr, val);
-      } else {
-        el.textContent = val;
-      }
+      if (attr) el.setAttribute(attr, val);
+      else el.textContent = val;
     });
-    var langBtn = document.getElementById('langBtn');
-    if (langBtn) {
-      langBtn.textContent = currentLang === 'zh' ? 'EN' : '中';
-    }
+    document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : 'ZH';
     refreshStatusFromKey();
-    updateSyncHintText();
-    updateSceneInfo();
-    updateEnterButton();
     refreshFooterHostLine();
-    if (document.getElementById('sidePanel').classList.contains('visible')) {
-      renderConnections();
-    }
+    if (document.getElementById('sidePanel').classList.contains('visible')) renderConnections();
   }
 
   var KEY_CONNECTIONS = 'tt_connections';
   var KEY_HOME_HINT = 'tt_home_hint_dismissed';
-  var KEY_MODE = 'tt_sync_mode';
-  var KEY_SCENE = 'tt_active_scene';
+  var KEY_AUTO_ENTER = 'tt_auto_enter';
 
   var ws = null;
   var connected = false;
   var reconnectTimer = null;
   var reconnectAttempts = 0;
-  var syncTimer = null;
-  var lastSyncedText = '';
-  var composing = false;
-  var syncMode = load(KEY_MODE) || 'replace';
-
   var currentStatusKey = 'connecting';
   var currentStatusParams = null;
+
+  var textInput = document.getElementById('textInput');
+  var statusDot = document.getElementById('statusDot');
+  var statusText = document.getElementById('statusText');
+  var charCount = document.getElementById('charCount');
+  var autoEnterCb = document.getElementById('autoEnterCb');
+
+  var savedAutoEnter = load(KEY_AUTO_ENTER);
+  if (savedAutoEnter !== null) autoEnterCb.checked = savedAutoEnter;
 
   function setStatus(key, params) {
     currentStatusKey = key;
@@ -541,27 +477,16 @@
     statusText.textContent = currentStatusParams ? t(currentStatusKey, currentStatusParams) : t(currentStatusKey);
   }
 
-  // Scene state
-  var scenes = [];
-  var activeScene = null;
-  var silenceTimer = null;
-  var sentTextEnd = 0; // tracks how many chars already sent via trigger_scene
-
-  var textInput = document.getElementById('textInput');
-  var statusDot = document.getElementById('statusDot');
-  var statusText = document.getElementById('statusText');
-  var charCount = document.getElementById('charCount');
-  var syncHint = document.getElementById('syncHint');
-
   init();
 
   function init() {
-    applyMode(syncMode);
     bindEvents();
     applyI18n();
     connectWS();
     saveConnection();
     showHomeHint();
+    setupKeyboardHandling();
+    setTimeout(function() { textInput.focus(); }, 300);
   }
 
   function bindEvents() {
@@ -573,78 +498,32 @@
 
     textInput.addEventListener('input', function() {
       charCount.textContent = textInput.value.length;
-      if (!composing) {
-        scheduleSync();
-      }
-    });
-
-    textInput.addEventListener('compositionstart', function() {
-      composing = true;
-    });
-
-    textInput.addEventListener('compositionend', function() {
-      composing = false;
-      charCount.textContent = textInput.value.length;
-      scheduleSync();
+      updateClearBtn();
     });
 
     textInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !composing) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
-        doSendEnter();
+        doSync();
       }
     });
 
-    textInput.addEventListener('focus', function() {
-      requestAnimationFrame(function() {
-        setTimeout(function() {
-          textInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 350);
-      });
-    });
-
-    document.getElementById('enterBtn').addEventListener('click', doSendEnter);
-
-    document.getElementById('clearBtn').addEventListener('click', function() {
+    document.getElementById('inputClearBtn').addEventListener('click', function() {
       textInput.value = '';
       charCount.textContent = '0';
-      lastSyncedText = '';
-      sentTextEnd = 0;
-      clearTimeout(silenceTimer);
-      if (connected && syncMode === 'replace' && isRealtimeSync()) {
-        ws.send(JSON.stringify({ type: 'sync', text: '' }));
-      }
-      showSyncHint(t('cleared'));
+      updateClearBtn();
+      toast(t('cleared'));
+      textInput.focus();
     });
 
-    document.getElementById('modeBtnReplace').addEventListener('click', function() { applyMode('replace'); });
-    document.getElementById('modeBtnAppend').addEventListener('click', function() { applyMode('append'); });
-
-    document.getElementById('sceneSelect').addEventListener('change', function() {
-      selectScene(this.value);
+    autoEnterCb.addEventListener('change', function() {
+      save(KEY_AUTO_ENTER, autoEnterCb.checked);
     });
 
     document.getElementById('settingsBtn').addEventListener('click', openPanel);
     document.getElementById('panelOverlay').addEventListener('click', closePanel);
     document.getElementById('panelCloseBtn').addEventListener('click', closePanel);
     document.getElementById('dismissHintBtn').addEventListener('click', dismissHomeHint);
-
-    if (window.visualViewport) {
-      var lastH = window.visualViewport.height;
-      window.visualViewport.addEventListener('resize', function() {
-        var vh = window.visualViewport.height;
-        var diff = lastH - vh;
-        if (diff > 100) {
-          document.body.style.height = vh + 'px';
-        } else if (diff < -100) {
-          document.body.style.height = '100%';
-        }
-        lastH = vh;
-      });
-      window.visualViewport.addEventListener('scroll', function() {
-        window.scrollTo(0, 0);
-      });
-    }
 
     document.body.addEventListener('touchmove', function(e) {
       var scrollable = e.target.closest('.text-input, .side-panel');
@@ -659,210 +538,40 @@
     });
   }
 
-  // ─── Send Enter ───
+  // ─── Clear Button Visibility ───
 
-  function doSendEnter() {
-    if (!connected) return;
-    clearTimeout(silenceTimer);
-    clearTimeout(syncTimer);
-
-    if (activeScene && activeScene.actions && activeScene.actions.length > 0) {
-      if (isRealtimeSync()) { doSync(); }
-      var textToSend = textInput.value.substring(sentTextEnd);
-      if (!textToSend && !isRealtimeSync()) return;
-      ws.send(JSON.stringify({ type: 'trigger_scene', text: textToSend || textInput.value }));
-      textInput.value = '';
-      charCount.textContent = '0';
-      lastSyncedText = '';
-      sentTextEnd = 0;
-      showSyncHint(t('triggered') + activeScene.name);
-      return;
-    }
-
-    if (isRealtimeSync()) {
-      doSync();
-    }
-    ws.send(JSON.stringify({ type: 'enter' }));
-    textInput.value = '';
-    charCount.textContent = '0';
-    lastSyncedText = '';
-    sentTextEnd = 0;
-    showSyncHint(t('sent'));
+  function updateClearBtn() {
+    var btn = document.getElementById('inputClearBtn');
+    if (textInput.value.length > 0) btn.classList.add('visible');
+    else btn.classList.remove('visible');
   }
 
-  // ─── Mode ───
+  // ─── Keyboard Handling ───
 
-  function applyMode(mode) {
-    syncMode = mode;
-    save(KEY_MODE, mode);
-    document.getElementById('modeBtnReplace').classList.toggle('active', mode === 'replace');
-    document.getElementById('modeBtnAppend').classList.toggle('active', mode === 'append');
-    updateSyncHintText();
-    lastSyncedText = textInput.value;
-  }
-
-  function updateSyncHintText() {
-    if (!isRealtimeSync()) {
-      document.getElementById('syncHint').textContent = t('hintBuffer');
-      return;
-    }
-    var hint = syncMode === 'replace' ? t('hintReplace') : t('hintAppend');
-    document.getElementById('syncHint').textContent = hint;
-  }
-
-  // ─── Scenes ───
-
-  function isRealtimeSync() {
-    return !activeScene || activeScene.realtime_sync !== false;
-  }
-
-  function renderSceneSelector() {
-    var sel = document.getElementById('sceneSelect');
-    sel.innerHTML = '';
-    scenes.forEach(function(s) {
-      var opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = s.name;
-      sel.appendChild(opt);
-    });
-    document.getElementById('sceneBar').style.display = scenes.length > 1 ? '' : 'none';
-  }
-
-  function selectScene(sceneId) {
-    activeScene = null;
-    for (var i = 0; i < scenes.length; i++) {
-      if (scenes[i].id === sceneId) {
-        activeScene = scenes[i];
-        break;
-      }
-    }
-    if (!activeScene && scenes.length > 0) {
-      activeScene = scenes[0];
-    }
-    if (!activeScene) return;
-
-    save(KEY_SCENE, activeScene.id);
-    document.getElementById('sceneSelect').value = activeScene.id;
-
-    if (connected && ws && ws.readyState === 1) {
-      ws.send(JSON.stringify({ type: 'switch_scene', scene_id: activeScene.id }));
-    }
-
-    updateSceneInfo();
-    updateSyncHintText();
-    sentTextEnd = 0;
-    clearTimeout(silenceTimer);
-  }
-
-  function updateSceneInfo() {
-    var el = document.getElementById('sceneInfo');
-    if (!activeScene || activeScene.id === 'default') {
-      el.style.display = 'none';
-      updateEnterButton();
-      return;
-    }
-
-    var info = activeScene.description || '';
-    if (activeScene.trigger && activeScene.trigger.type === 'Silence') {
-      var sec = (activeScene.trigger.timeout_ms / 1000).toFixed(1).replace(/\.0$/, '');
-      info = t('silenceInfo', { sec: sec });
-      if (!activeScene.realtime_sync) {
-        info += t('bufferMode');
-      }
-    }
-
-    if (info) {
-      el.textContent = info;
-      el.style.display = '';
-      el.classList.toggle('active', activeScene.trigger && activeScene.trigger.type === 'Silence');
-    } else {
-      el.style.display = 'none';
-    }
-
-    updateEnterButton();
-  }
-
-  function updateEnterButton() {
-    var btn = document.getElementById('enterBtn');
-    if (activeScene && activeScene.actions && activeScene.actions.length > 0) {
-      btn.textContent = t('sendBtn');
-    } else {
-      btn.textContent = t('enterBtn');
+  function setupKeyboardHandling() {
+    var appEl = document.getElementById('app');
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', function() {
+        appEl.style.height = window.visualViewport.height + 'px';
+      });
+      window.visualViewport.addEventListener('scroll', function() {
+        window.scrollTo(0, 0);
+      });
     }
   }
 
-  function resetSilenceTimer() {
-    clearTimeout(silenceTimer);
-    if (!activeScene || !activeScene.trigger || activeScene.trigger.type !== 'Silence') return;
-    if (!connected || !textInput.value) return;
-    if (textInput.value.length <= sentTextEnd) return;
-
-    silenceTimer = setTimeout(onSilenceTimeout, activeScene.trigger.timeout_ms);
-  }
-
-  function onSilenceTimeout() {
-    if (!connected || !ws || ws.readyState !== 1) return;
-    if (!activeScene || !activeScene.trigger || activeScene.trigger.type !== 'Silence') return;
-    if (!textInput.value) return;
-
-    // Flush pending real-time sync
-    if (isRealtimeSync()) {
-      clearTimeout(syncTimer);
-      doSync();
-    }
-
-    var textToSend = textInput.value.substring(sentTextEnd);
-    if (!textToSend) return;
-
-    ws.send(JSON.stringify({ type: 'trigger_scene', text: textToSend }));
-    sentTextEnd = textInput.value.length;
-
-    showSyncHint(t('triggered') + activeScene.name);
-    toast(t('autoSent'));
-  }
-
-  // ─── Real-time Sync ───
-
-  function scheduleSync() {
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(doSync, 250);
-    resetSilenceTimer();
-  }
+  // ─── Sync ───
 
   function doSync() {
+    if (!connected || !textInput.value.trim()) return;
     var text = textInput.value;
-    if (text === lastSyncedText) return;
-    if (!connected || !ws || ws.readyState !== 1) return;
-
-    // Skip real-time sync when scene disables it
-    if (!isRealtimeSync()) {
-      lastSyncedText = text;
-      return;
-    }
-
-    if (syncMode === 'append') {
-      if (text.length > lastSyncedText.length &&
-          text.substring(0, lastSyncedText.length) === lastSyncedText) {
-        var delta = text.substring(lastSyncedText.length);
-        ws.send(JSON.stringify({ type: 'input', text: delta }));
-        showSyncHint(t('appended', { count: delta.length }));
-      }
-      lastSyncedText = text;
-    } else {
-      lastSyncedText = text;
-      ws.send(JSON.stringify({ type: 'sync', text: text }));
-      showSyncHint(t('synced', { count: text.length }));
-    }
-  }
-
-  function showSyncHint(msg) {
-    syncHint.textContent = msg;
-    syncHint.classList.add('active');
-    clearTimeout(syncHint._t);
-    syncHint._t = setTimeout(function() {
-      syncHint.classList.remove('active');
-      syncHint.textContent = t('syncHint');
-    }, 1500);
+    var autoEnter = autoEnterCb.checked;
+    ws.send(JSON.stringify({ type: 'send', text: text, auto_enter: autoEnter }));
+    textInput.value = '';
+    charCount.textContent = '0';
+    updateClearBtn();
+    toast(t('synced'));
+    textInput.focus();
   }
 
   // ─── WebSocket ───
@@ -875,13 +584,8 @@
   function connectWS() {
     if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
     setStatus('connecting');
-    try {
-      ws = new WebSocket(getWsUrl());
-    } catch (e) {
-      setStatus('connFailed');
-      scheduleReconnect();
-      return;
-    }
+    try { ws = new WebSocket(getWsUrl()); }
+    catch (e) { setStatus('connFailed'); scheduleReconnect(); return; }
 
     ws.onopen = function() {
       connected = true;
@@ -890,35 +594,15 @@
       setStatus('connected');
       toast(t('connectedToast'));
       updateConnectionStatus(true);
-
-      // Re-send active scene after reconnect
-      var savedId = load(KEY_SCENE) || 'default';
-      if (activeScene && ws.readyState === 1) {
-        ws.send(JSON.stringify({ type: 'switch_scene', scene_id: activeScene.id }));
-      }
     };
-
-    ws.onmessage = function(ev) {
-      try {
-        var data = JSON.parse(ev.data);
-        if (data.type === 'scenes') {
-          scenes = data.scenes || [];
-          renderSceneSelector();
-          var savedId = load(KEY_SCENE) || 'default';
-          selectScene(savedId);
-        }
-      } catch(e) {}
-    };
-
+    ws.onmessage = function() {};
     ws.onclose = function() {
       connected = false;
       statusDot.classList.remove('connected');
       setStatus('disconnected');
       updateConnectionStatus(false);
-      clearTimeout(silenceTimer);
       scheduleReconnect();
     };
-
     ws.onerror = function() {
       connected = false;
       statusDot.classList.remove('connected');
@@ -927,10 +611,7 @@
 
   function scheduleReconnect() {
     if (reconnectTimer) clearTimeout(reconnectTimer);
-    if (reconnectAttempts >= 200) {
-      setStatus('cannotConnect');
-      return;
-    }
+    if (reconnectAttempts >= 200) { setStatus('cannotConnect'); return; }
     var delay = Math.min(1000 * Math.pow(1.3, reconnectAttempts), 8000);
     reconnectAttempts++;
     reconnectTimer = setTimeout(function() {
@@ -948,7 +629,6 @@
     document.getElementById('sidePanel').classList.add('visible');
     renderConnections();
   }
-
   function closePanel() {
     document.getElementById('panelOverlay').classList.remove('visible');
     document.getElementById('sidePanel').classList.remove('visible');
@@ -965,7 +645,8 @@
         lastSeen: Date.now(), network: getNetworkId(), connected: true
       };
       var idx = conns.findIndex(function(c) { return c.host === cur.host; });
-      if (idx >= 0) { Object.assign(conns[idx], cur); } else { conns.unshift(cur); }
+      if (idx >= 0) Object.assign(conns[idx], cur);
+      else conns.unshift(cur);
       if (conns.length > 20) conns.length = 20;
       save(KEY_CONNECTIONS, conns);
       document.getElementById('footerInfo').textContent = cur.host + ' · ' + getNetworkLabel(cur.network);
@@ -976,10 +657,7 @@
     try {
       var conns = load(KEY_CONNECTIONS) || [];
       var idx = conns.findIndex(function(c) { return c.host === location.host; });
-      if (idx >= 0) {
-        var cur = conns[idx];
-        document.getElementById('footerInfo').textContent = cur.host + ' · ' + getNetworkLabel(cur.network);
-      }
+      if (idx >= 0) document.getElementById('footerInfo').textContent = conns[idx].host + ' · ' + getNetworkLabel(conns[idx].network);
     } catch (e) {}
   }
 
@@ -1010,43 +688,33 @@
     });
     var html = '';
     Object.keys(groups).forEach(function(net) {
-      html += '<div style="font-size:11px;color:var(--text-muted);margin:8px 0 4px;font-weight:600;">' +
-              esc(getNetworkLabel(net)) + '</div>';
+      html += '<div style="font-size:11px;color:var(--text-muted);margin:8px 0 4px;font-weight:600;">' + esc(getNetworkLabel(net)) + '</div>';
       groups[net].forEach(function(c) {
         var isCurrent = c.host === location.host;
         html += '<div class="conn-item' + (isCurrent ? ' current' : '') + '" data-url="' + esc(c.url) + '">' +
           '<div class="conn-icon">' + (isCurrent ? '🟢' : '📡') + '</div>' +
-          '<div class="conn-info">' +
-            '<div class="conn-host">' + esc(c.host) + '</div>' +
-            '<div class="conn-meta">' + esc(timeAgo(c.lastSeen)) + '</div>' +
-          '</div>' +
+          '<div class="conn-info"><div class="conn-host">' + esc(c.host) + '</div>' +
+          '<div class="conn-meta"><span>' + esc(timeAgo(c.lastSeen)) + '</span>' +
           '<span class="conn-badge ' + (isCurrent ? 'active' : 'saved') + '">' +
-            esc(isCurrent ? t('current') : t('saved')) +
-          '</span></div>';
+          esc(isCurrent ? t('current') : t('saved')) + '</span></div></div></div>';
       });
     });
     list.innerHTML = html;
     list.querySelectorAll('.conn-item').forEach(function(el) {
       el.addEventListener('click', function() {
         var url = el.getAttribute('data-url');
-        if (url && url !== location.origin) {
-          window.location.href = url;
-        } else {
-          closePanel();
-        }
+        if (url && url !== location.origin) window.location.href = url;
+        else closePanel();
       });
     });
   }
 
   function getNetworkId() {
     var parts = location.hostname.split('.');
-    if (parts.length === 4) return parts.slice(0, 3).join('.');
-    return location.hostname;
+    return parts.length === 4 ? parts.slice(0, 3).join('.') : location.hostname;
   }
-
   function getNetworkLabel(netId) {
-    if (!netId || netId === 'unknown') return t('unknownNetwork');
-    return t('networkLabel', { net: netId });
+    return (!netId || netId === 'unknown') ? t('unknownNetwork') : t('networkLabel', { net: netId });
   }
 
   // ─── Home Screen Hint ───
@@ -1055,11 +723,8 @@
     if (load(KEY_HOME_HINT)) return;
     var isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isMobile && !isStandalone) {
-      document.getElementById('addHomeHint').style.display = 'flex';
-    }
+    if (isMobile && !isStandalone) document.getElementById('addHomeHint').style.display = 'flex';
   }
-
   function dismissHomeHint() {
     document.getElementById('addHomeHint').style.display = 'none';
     save(KEY_HOME_HINT, true);
@@ -1068,13 +733,12 @@
   // ─── Utils ───
 
   function toast(msg) {
-    var toastEl = document.getElementById('toast');
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    clearTimeout(toastEl._timer);
-    toastEl._timer = setTimeout(function() { toastEl.classList.remove('show'); }, 1400);
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(function() { el.classList.remove('show'); }, 1400);
   }
-
   function timeAgo(ts) {
     var d = Date.now() - ts;
     if (d < 60000) return t('justNow');
@@ -1082,26 +746,12 @@
     if (d < 86400000) return t('hoursAgo', { n: Math.floor(d / 3600000) });
     return t('daysAgo', { n: Math.floor(d / 86400000) });
   }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+  function load(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
 
-  function esc(s) {
-    var d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
-  function save(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
-  }
-
-  function load(key) {
-    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; }
-  }
-
-  // Keepalive
   setInterval(function() {
-    if (ws && ws.readyState === 1) {
-      try { ws.send('{"type":"ping"}'); } catch(e) {}
-    }
+    if (ws && ws.readyState === 1) try { ws.send('{"type":"ping"}'); } catch(e) {}
   }, 20000);
 })();
 </script>

@@ -114,18 +114,22 @@ jobs:
             > Global voice input for vibe coding.
 
             ### What's New
-            * Scene management overhaul: built-in scenes are now code-embedded (read-only), with duplicate, unique name validation, and import-overwrite confirmation
-            * Built-in scene names & descriptions are now localized (EN/CN)
-            * Settings icon changed to gear; reduced redundant "TalkType" headings
-            * Footer shows version + open-source link; "Check for Updates" moved to Settings
-            * Debug logs unified to English for developer consistency
+            * Removed the entire scene automation system for a simpler, focused experience
+            * Switched from real-time sync to explicit "tap to send" model
+            * Added auto-enter toggle: optionally press Enter after sending, great for chat apps
+            * Simplified WebSocket protocol to a single `send` message type
+            * Removed `uuid`, `arboard`, `rfd` dependencies — smaller binary size
+            * Redesigned mobile UI: inline status indicator, cleaner layout, auto-enter switch
+            * Desktop UI: removed scene editor, streamlined settings
 
             ### 更新内容
-            * 场景管理重构：内置场景代码内置且只读，支持复制、名称唯一校验、导入覆盖确认
-            * 内置场景名称和描述支持中英文国际化
-            * 设置图标改为齿轮样式，减少重复的「TalkType」标题
-            * 页脚显示版本号与开源链接，「检查更新」移至设置页
-            * 调试日志统一为英文，方便开发者排查
+            * 移除场景自动化系统，回归简洁核心体验
+            * 从「实时同步」改为「点击发送」模式
+            * 新增自动回车开关：发送后可自动按回车，适用于聊天场景
+            * WebSocket 协议精简为单一 `send` 消息类型
+            * 移除 `uuid`、`arboard`、`rfd` 依赖，减小包体积
+            * 手机端 UI 重新设计：状态指示内联、布局更简洁、自动回车开关
+            * 桌面端移除场景编辑器，精简设置页面
 
             ### Download
             | Platform | File |

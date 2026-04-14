@@ -5,22 +5,16 @@ use axum::{
     Router,
 };
 use futures_util::{SinkExt, StreamExt};
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::OnceCell;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use tauri::AppHandle;
 use tauri::Emitter;
-use tokio::sync::broadcast;
 use tower_http::cors::CorsLayer;
 
 use crate::keyboard;
-use crate::scene;
 
 static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
 static CLIENT_COUNT: AtomicUsize = AtomicUsize::new(0);
-static SCENE_TX: Lazy<broadcast::Sender<String>> = Lazy::new(|| {
-    let (tx, _) = broadcast::channel(16);
-    tx
-});
 
 pub fn set_app_handle(handle: AppHandle) {
     let _ = APP_HANDLE.set(handle);
@@ -88,16 +82,6 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
     ws.on_upgrade(handle_socket)
 }
 
-pub fn broadcast_scenes() {
-    let scenes = scene::get_scenes();
-    let msg = serde_json::json!({
-        "type": "scenes",
-        "scenes": scenes
-    })
-    .to_string();
-    let _ = SCENE_TX.send(msg);
-}
-
 async fn handle_socket(socket: WebSocket) {
     CLIENT_COUNT.fetch_add(1, Ordering::Relaxed);
     emit_client_count();
@@ -108,7 +92,6 @@ async fn handle_socket(socket: WebSocket) {
 
     let (mut sender, mut receiver) = socket.split();
 
-    // Send welcome message
     let _ = sender
         .send(Message::Text(
             serde_json::json!({
@@ -120,69 +103,19 @@ async fn handle_socket(socket: WebSocket) {
         ))
         .await;
 
-    // Send available scenes
-    let scenes = scene::get_scenes();
-    let _ = sender
-        .send(Message::Text(
-            serde_json::json!({
-                "type": "scenes",
-                "scenes": scenes
-            })
-            .to_string()
-            .into(),
-        ))
-        .await;
-
-    let mut scene_rx = SCENE_TX.subscribe();
-    let mut active_scene_id = String::from("default");
-
-    loop {
-        tokio::select! {
-            msg = receiver.next() => {
-                match msg {
-                    Some(Ok(Message::Text(text))) => {
-                        let parsed: Result<serde_json::Value, _> = serde_json::from_str(&text);
-                        match parsed {
-                            Ok(msg_val) => {
-                                let msg_type = msg_val["type"].as_str().unwrap_or("");
-                                match msg_type {
-                                    "switch_scene" => {
-                                        if let Some(id) = msg_val["scene_id"].as_str() {
-                                            active_scene_id = id.to_string();
-                                            log::info!("Scene switched to: {}", id);
-                                        }
-                                    }
-                                    "trigger_scene" => {
-                                        let sync_text =
-                                            msg_val["text"].as_str().unwrap_or("").to_string();
-                                        let scene_id = active_scene_id.clone();
-                                        std::thread::spawn(move || {
-                                            scene::execute_scene(&scene_id, &sync_text);
-                                        });
-                                    }
-                                    _ => {
-                                        handle_text_message(&msg_val);
-                                    }
-                                }
-                            }
-                            Err(e) => {
-                                log::error!("Failed to parse message: {}", e);
-                            }
-                        }
-                    }
-                    Some(Ok(Message::Close(_))) | None => break,
-                    Some(Err(e)) => {
-                        log::error!("WebSocket error: {}", e);
-                        break;
-                    }
-                    _ => {}
+    while let Some(msg) = receiver.next().await {
+        match msg {
+            Ok(Message::Text(text)) => {
+                if let Ok(msg_val) = serde_json::from_str::<serde_json::Value>(&text) {
+                    handle_message(&msg_val);
                 }
             }
-            Ok(scene_msg) = scene_rx.recv() => {
-                if sender.send(Message::Text(scene_msg.into())).await.is_err() {
-                    break;
-                }
+            Ok(Message::Close(_)) => break,
+            Err(e) => {
+                log::error!("WebSocket error: {}", e);
+                break;
             }
+            _ => {}
         }
     }
 
@@ -194,30 +127,20 @@ async fn handle_socket(socket: WebSocket) {
     );
 }
 
-fn handle_text_message(msg: &serde_json::Value) {
+fn handle_message(msg: &serde_json::Value) {
     let msg_type = msg["type"].as_str().unwrap_or("");
     match msg_type {
-        "input" => {
-            if let Some(content) = msg["text"].as_str() {
-                if !content.is_empty() {
-                    log::info!("Typing: {}", content);
-                    keyboard::type_text(content);
+        "send" => {
+            if let Some(text) = msg["text"].as_str() {
+                if !text.is_empty() {
+                    log::info!("Send: {} chars", text.len());
+                    keyboard::type_text(text);
                 }
             }
-        }
-        "enter" => {
-            log::info!("Pressing enter");
-            keyboard::press_enter();
-        }
-        "sync" => {
-            if let Some(content) = msg["text"].as_str() {
-                log::info!("Sync: {} chars", content.len());
-                keyboard::replace_all_text(content);
+            if msg["auto_enter"].as_bool().unwrap_or(false) {
+                std::thread::sleep(std::time::Duration::from_millis(30));
+                keyboard::press_enter();
             }
-        }
-        "clear" => {
-            log::info!("Clearing current input");
-            keyboard::clear_current();
         }
         "ping" => {}
         _ => {

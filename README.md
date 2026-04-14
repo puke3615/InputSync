@@ -58,7 +58,7 @@
 1. **Download** → [Latest Release](../../releases/latest) (macOS / Windows / Linux)
 2. **Open TalkType** on your computer → QR code appears
 3. **Scan** the QR code with your phone → web page opens (no app install)
-4. **Speak** → text appears at your cursor ✨
+4. **Speak** on your phone → tap **Send** → text appears at your cursor ✨
 
 > ⚠️ Phone and computer must be on the **same WiFi**.
 
@@ -74,9 +74,8 @@
 - 📱 **Zero install on phone** — phone client is a web page, no app needed
 - 🔒 **100% local network** — all data stays on your WiFi, zero cloud dependency
 - 📷 **QR code pairing** — scan and connect in seconds
-- 🔄 **Real-time sync** — see text as you speak, character by character
+- ↵ **Auto-Enter** — optionally press Enter after sending, perfect for chat apps
 - 🔁 **Auto reconnect** — remembers connections, auto-reconnects on same WiFi
-- ⚡ **Scene automation** — create workflows with triggers and action sequences
 - 🌍 **i18n** — English and Chinese UI, auto-detects your language
 - 🌍 **Cross-platform** — macOS, Windows, Linux
 - 📲 **PWA support** — add to phone home screen for app-like experience
@@ -196,7 +195,7 @@ Yes. All communication happens over your local WiFi via WebSocket. No data ever 
 ```
 ┌─────────────┐       WiFi (LAN)        ┌──────────────┐
 │  📱 Phone    │  ◄── WebSocket ──►      │  💻 Computer  │
-│  (Browser)   │     real-time sync      │  (Desktop App)│
+│  (Browser)   │      tap to send        │  (Desktop App)│
 │              │                         │       ↓       │
 │  🎤 Voice    │                         │  ⌨️ Keyboard  │
 │  → Text      │                         │   Injection   │
@@ -244,14 +243,13 @@ Output: `src-tauri/target/release/bundle/`
 
 ```
 TalkType/
-├── src/index.html              # Desktop UI (i18n, QR code, scene editor)
+├── src/index.html              # Desktop UI (i18n, QR code)
 ├── src-tauri/
 │   ├── src/
 │   │   ├── lib.rs              # App entry & Tauri commands
 │   │   ├── server.rs           # HTTP + WebSocket server (Axum)
 │   │   ├── mobile.html         # Mobile PWA page (i18n, served at /)
 │   │   ├── keyboard.rs         # Keyboard simulation (per-platform)
-│   │   ├── scene.rs            # Scene automation engine
 │   │   ├── network.rs          # LAN IP discovery
 │   │   └── qrcode_gen.rs       # QR code generation
 │   └── tauri.conf.json

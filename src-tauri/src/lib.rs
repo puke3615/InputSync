@@ -1,8 +1,6 @@
-mod config;
 mod keyboard;
 mod network;
 mod qrcode_gen;
-mod scene;
 mod server;
 
 use once_cell::sync::Lazy;
@@ -82,126 +80,12 @@ fn open_accessibility_settings() {
 }
 
 #[tauri::command]
-fn open_config_dir() -> Result<(), String> {
-    let dir = config::config_dir_path();
-    #[cfg(target_os = "macos")]
-    {
-        std::process::Command::new("open")
-            .arg(&dir)
-            .spawn()
-            .map_err(|e| e.to_string())?;
-    }
-    #[cfg(target_os = "windows")]
-    {
-        std::process::Command::new("explorer")
-            .arg(&dir)
-            .spawn()
-            .map_err(|e| e.to_string())?;
-    }
-    #[cfg(target_os = "linux")]
-    {
-        std::process::Command::new("xdg-open")
-            .arg(&dir)
-            .spawn()
-            .map_err(|e| e.to_string())?;
-    }
-    Ok(())
-}
-
-#[tauri::command]
 fn get_app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-#[tauri::command]
-fn get_scenes() -> Vec<scene::Scene> {
-    scene::get_scenes()
-}
-
-#[tauri::command]
-fn save_scene(new_scene: scene::Scene) -> Result<Vec<scene::Scene>, String> {
-    if let Some(existing) = scene::find_scene(&new_scene.id) {
-        if existing.builtin {
-            return Err("Cannot modify built-in scene".to_string());
-        }
-    }
-    let mut s = new_scene;
-    s.builtin = false;
-    scene::save_scene(s);
-    let scenes = scene::get_scenes();
-    config::save_scenes(&scenes);
-    server::broadcast_scenes();
-    Ok(scenes)
-}
-
-#[tauri::command]
-fn delete_scene(id: String) -> Vec<scene::Scene> {
-    let deleted = scene::delete_scene(&id);
-    log::info!("delete_scene id={}, success={}", id, deleted);
-    let scenes = scene::get_scenes();
-    config::save_scenes(&scenes);
-    server::broadcast_scenes();
-    scenes
-}
-
-#[tauri::command]
-fn export_scene_file(id: String) -> Result<String, String> {
-    let scene = scene::find_scene(&id).ok_or_else(|| "Scene not found".to_string())?;
-    let json = serde_json::to_string_pretty(&scene).map_err(|e| e.to_string())?;
-    let safe_name: String = scene
-        .name
-        .chars()
-        .map(|c| if c == '/' || c == '\\' || c == ':' { '_' } else { c })
-        .collect();
-    let filename = format!("TalkType-{}.json", safe_name);
-
-    let path = rfd::FileDialog::new()
-        .set_title("Export Scene")
-        .set_file_name(&filename)
-        .add_filter("JSON", &["json"])
-        .save_file();
-
-    match path {
-        Some(p) => {
-            std::fs::write(&p, &json).map_err(|e| e.to_string())?;
-            Ok(p.display().to_string())
-        }
-        None => Err("Cancelled".to_string()),
-    }
-}
-
-#[tauri::command]
-fn import_scene_data(json: String, overwrite_id: Option<String>) -> Result<Vec<scene::Scene>, String> {
-    let mut s: scene::Scene =
-        serde_json::from_str(&json).map_err(|e| format!("Parse failed: {}", e))?;
-    s.builtin = false;
-    if let Some(oid) = overwrite_id {
-        if let Some(existing) = scene::find_scene(&oid) {
-            if existing.builtin {
-                return Err("Cannot overwrite built-in scene".to_string());
-            }
-        }
-        s.id = oid;
-    } else {
-        s.id = format!(
-            "import-{}",
-            &uuid::Uuid::new_v4().to_string()[..8]
-        );
-    }
-    scene::save_scene(s);
-    let scenes = scene::get_scenes();
-    config::save_scenes(&scenes);
-    server::broadcast_scenes();
-    Ok(scenes)
-}
-
 pub fn run() {
     env_logger::init();
-
-    // Load config and initialize scenes
-    let app_config = config::load_config();
-    scene::init(app_config.scenes);
-    log::info!("Loaded {} scenes", scene::get_scenes().len());
 
     let port: u16 = 5678;
     let local_ip = network::get_local_ip().unwrap_or_else(|| "127.0.0.1".to_string());
@@ -228,13 +112,7 @@ pub fn run() {
             generate_qr,
             check_accessibility,
             open_accessibility_settings,
-            open_config_dir,
             get_app_version,
-            get_scenes,
-            save_scene,
-            delete_scene,
-            export_scene_file,
-            import_scene_data,
         ])
         .setup(|app| {
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
