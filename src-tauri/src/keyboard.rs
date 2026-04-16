@@ -1,16 +1,20 @@
 use enigo::{Enigo, Keyboard as _, Settings};
 
-pub fn type_text(text: &str) {
-    let mut enigo = match Enigo::new(&Settings::default()) {
-        Ok(e) => e,
-        Err(e) => {
-            log::error!("Failed to create Enigo: {}", e);
-            return;
-        }
-    };
-    if let Err(e) = enigo.text(text) {
-        log::error!("Failed to type text: {}", e);
+/// Types UTF-8 text via the OS-level keyboard simulator. Success means the
+/// simulator accepted the sequence (not that a specific app's field updated).
+pub fn type_text(text: &str) -> Result<(), String> {
+    if text.is_empty() {
+        return Ok(());
     }
+    let mut enigo = Enigo::new(&Settings::default()).map_err(|e| {
+        log::error!("Failed to create Enigo: {}", e);
+        format!("keyboard_init: {}", e)
+    })?;
+    enigo.text(text).map_err(|e| {
+        log::error!("Failed to type text: {}", e);
+        format!("keyboard_type: {}", e)
+    })?;
+    Ok(())
 }
 
 pub fn press_enter() {

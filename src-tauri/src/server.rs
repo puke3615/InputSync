@@ -6,6 +6,7 @@ use axum::{
 };
 use futures_util::{SinkExt, StreamExt};
 use once_cell::sync::OnceCell;
+use std::time::Duration;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use tauri::AppHandle;
 use tauri::Emitter;
@@ -113,7 +114,28 @@ async fn handle_socket(socket: WebSocket) {
         match msg {
             Ok(Message::Text(text)) => {
                 if let Ok(msg_val) = serde_json::from_str::<serde_json::Value>(&text) {
-                    handle_message(&msg_val);
+                    let msg_type = msg_val["type"].as_str().unwrap_or("");
+                    match msg_type {
+                        "ping" => {}
+                        "send" => {
+                            let text_to_send = msg_val["text"].as_str().unwrap_or("").to_string();
+                            let auto_enter = msg_val["auto_enter"].as_bool().unwrap_or(false);
+                            tokio::spawn(async move {
+                                match tokio::task::spawn_blocking(move || {
+                                    process_send_to_desktop(text_to_send, auto_enter)
+                                })
+                                .await
+                                {
+                                    Ok(Ok(())) => {}
+                                    Ok(Err(e)) => log::warn!("Send failed: {}", e),
+                                    Err(e) => log::error!("Send task join error: {}", e),
+                                }
+                            });
+                        }
+                        other => {
+                            log::warn!("Unknown WebSocket message type: {}", other);
+                        }
+                    }
                 }
             }
             Ok(Message::Close(_)) => break,
@@ -133,26 +155,16 @@ async fn handle_socket(socket: WebSocket) {
     );
 }
 
-fn handle_message(msg: &serde_json::Value) {
-    let msg_type = msg["type"].as_str().unwrap_or("");
-    match msg_type {
-        "send" => {
-            if let Some(text) = msg["text"].as_str() {
-                if !text.is_empty() {
-                    log::info!("Send: {} chars", text.len());
-                    keyboard::type_text(text);
-                }
-            }
-            if msg["auto_enter"].as_bool().unwrap_or(false) {
-                std::thread::sleep(std::time::Duration::from_millis(30));
-                keyboard::press_enter();
-            }
-        }
-        "ping" => {}
-        _ => {
-            log::warn!("Unknown message type: {}", msg_type);
-        }
+fn process_send_to_desktop(text: String, auto_enter: bool) -> Result<(), String> {
+    if !text.is_empty() {
+        log::info!("Send: {} chars", text.len());
+        keyboard::type_text(&text)?;
     }
+    if auto_enter {
+        std::thread::sleep(Duration::from_millis(30));
+        keyboard::press_enter();
+    }
+    Ok(())
 }
 
 async fn serve_manifest() -> impl IntoResponse {

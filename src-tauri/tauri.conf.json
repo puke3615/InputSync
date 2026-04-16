@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicktomlin/tauri-settings-schema/main/v2.json",
   "productName": "TalkType",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "identifier": "com.talktype.desktop",
   "build": {
     "frontendDist": "../src"

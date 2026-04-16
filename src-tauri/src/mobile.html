@@ -91,18 +91,6 @@
   }
   .lang-btn:active { transform: scale(0.92); background: var(--primary-glow); color: var(--primary-light); }
 
-  /* ─── Home Hint ─── */
-  .add-home-hint {
-    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-    background: var(--primary-glow); border: 1px solid var(--border); border-radius: 10px;
-    font-size: 12px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;
-    flex-shrink: 0;
-  }
-  .add-home-hint .dismiss {
-    margin-left: auto; background: none; border: none; color: var(--text-muted);
-    font-size: 16px; cursor: pointer; padding: 4px; -webkit-appearance: none;
-  }
-
   /* ─── Toolbar ─── */
   .toolbar {
     flex-shrink: 0; display: flex; align-items: center;
@@ -183,16 +171,55 @@
     font-size: 11px; color: var(--text-muted); opacity: 0.3;
   }
 
-  /* ─── Toast ─── */
+  /* ─── Toast (top-right, slide in; avoids keyboard overlap) ─── */
   .toast {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.85);
-    background: rgba(15,15,30,0.92); color: white; padding: 12px 22px;
-    border-radius: 12px; font-size: 14px; font-weight: 500;
-    pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-    z-index: 1000; border: 1px solid var(--border); max-width: 80%; text-align: center;
+    position: fixed;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    left: auto;
+    max-width: min(340px, calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+    width: max-content;
+    background: rgba(22, 22, 42, 0.96);
+    color: var(--text);
+    padding: 11px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(calc(100% + 28px));
+    transition:
+      transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.28s ease;
+    z-index: 10050;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    text-align: left;
+    word-break: break-word;
   }
-  .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .toast.toast--success {
+    background: rgba(12, 46, 38, 0.96);
+    border-color: rgba(52, 211, 153, 0.4);
+    color: #ecfdf5;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(52, 211, 153, 0.12);
+  }
+  .toast.toast--warning {
+    background: rgba(48, 38, 12, 0.96);
+    border-color: rgba(251, 191, 36, 0.45);
+    color: #fef3c7;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(251, 191, 36, 0.12);
+  }
+  .toast.toast--error {
+    background: rgba(48, 18, 22, 0.96);
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #fee2e2;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(248, 113, 113, 0.15);
+  }
 
   /* ─── Settings Panel ─── */
   .panel-overlay {
@@ -250,6 +277,74 @@
   }
   .conn-badge.active { background: var(--success-glow); color: var(--success); }
   .conn-badge.saved { background: var(--primary-glow); color: var(--primary-light); }
+
+  .history-max-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px; font-size: 13px; color: var(--text-muted);
+  }
+  .history-max-input {
+    width: 72px; padding: 8px 10px; background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+    font-size: 14px; text-align: right; -webkit-appearance: none;
+  }
+  .msg-history-list {
+    max-height: 260px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    margin-bottom: 4px;
+  }
+  .msg-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px 10px;
+    background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border);
+    margin-bottom: 6px; cursor: pointer;
+    touch-action: manipulation;
+  }
+  .msg-row:active { background: rgba(40, 40, 72, 0.95); }
+  .msg-row-main { flex: 1; min-width: 0; }
+  .msg-row-text {
+    font-size: 13px; font-weight: 500; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.35;
+  }
+  .msg-row-meta { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+  .msg-row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .icon-act {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text-muted); cursor: pointer; -webkit-appearance: none; padding: 0;
+    touch-action: manipulation;
+  }
+  .icon-act:active { background: var(--primary-glow); color: var(--primary-light); }
+  .icon-act.danger:active { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+  /* ─── Message detail (fullscreen, scrollable) ─── */
+  .msg-detail-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 12px) 0 env(safe-area-inset-bottom, 12px);
+    max-width: 500px; margin: 0 auto; left: 0; right: 0;
+  }
+  .msg-detail-overlay.visible { display: flex; }
+  .msg-detail-header {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 12px 12px; border-bottom: 1px solid var(--border);
+  }
+  .msg-detail-header h3 {
+    font-size: 17px; font-weight: 700; padding-left: 4px;
+    flex: 1; min-width: 0;
+  }
+  .msg-detail-close {
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text-muted); font-size: 18px; cursor: pointer; -webkit-appearance: none;
+    touch-action: manipulation;
+  }
+  .msg-detail-close:active { background: var(--primary-glow); color: var(--text); }
+  .msg-detail-body {
+    flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 16px 18px 28px;
+    font-size: 16px; line-height: 1.65; color: var(--text);
+    white-space: pre-wrap; word-break: break-word;
+  }
 </style>
 </head>
 <body>
@@ -267,12 +362,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
-  </div>
-
-  <div id="addHomeHint" class="add-home-hint" style="display:none;">
-    <span>💡</span>
-    <span data-i18n="addHomeHint">Add to Home Screen for instant access next time</span>
-    <button class="dismiss" id="dismissHintBtn">✕</button>
   </div>
 
   <div class="toolbar">
@@ -320,6 +409,21 @@
     <div id="connectionList"></div>
   </div>
   <div class="panel-section">
+    <div class="panel-section-title" data-i18n="msgHistoryTitle">MESSAGE HISTORY</div>
+    <div class="toolbar">
+      <span class="toggle-label" data-i18n="saveHistoryLabel">Save messages locally</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="saveHistoryCb" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="history-max-row">
+      <span data-i18n="historyMaxLabel">Max saved messages</span>
+      <input type="number" class="history-max-input" id="historyMaxInput" min="1" max="500" value="100" inputmode="numeric">
+    </div>
+    <div class="msg-history-list" id="messageHistoryList"></div>
+  </div>
+  <div class="panel-section">
     <div class="panel-section-title" data-i18n="aboutTitle">ABOUT</div>
     <div data-i18n="aboutDesc" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
       TalkType<br>
@@ -329,6 +433,14 @@
   </div>
 </div>
 
+<div class="msg-detail-overlay" id="msgDetailOverlay" aria-hidden="true">
+  <div class="msg-detail-header">
+    <h3 id="msgDetailTitle" data-i18n="msgDetailTitle">Message detail</h3>
+    <button type="button" class="msg-detail-close" id="msgDetailCloseBtn" data-i18n="detailCloseAria" data-i18n-attr="aria-label">✕</button>
+  </div>
+  <div class="msg-detail-body" id="msgDetailBody"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -336,7 +448,7 @@
   'use strict';
 
   (function migrateLsKeys() {
-    [['is_connections','tt_connections'],['is_home_hint_dismissed','tt_home_hint_dismissed']].forEach(function(p) {
+    [['is_connections','tt_connections']].forEach(function(p) {
       try {
         if (localStorage.getItem(p[0]) !== null && localStorage.getItem(p[1]) === null) {
           localStorage.setItem(p[1], localStorage.getItem(p[0]));
@@ -355,12 +467,12 @@
       reconnecting: 'Reconnecting ({count})...',
       cannotConnect: 'Cannot connect',
       connFailed: 'Failed',
-      addHomeHint: 'Add to Home Screen for instant access next time',
       inputPh: 'Tap here, speak or type...',
       cleared: 'Cleared',
-      synced: 'Synced ✓',
+      dispatched: 'Sent',
       connectedToast: 'Connected to computer',
       autoEnterLabel: 'Auto-Enter on done',
+      saveHistoryLabel: 'Save messages locally',
       settingsTitle: 'Settings',
       connRecords: 'CONNECTION HISTORY',
       noConnRecords: 'No connection records',
@@ -373,7 +485,19 @@
       hoursAgo: '{n}h ago',
       daysAgo: '{n}d ago',
       networkLabel: 'Subnet {net}.x',
-      unknownNetwork: 'Unknown network'
+      unknownNetwork: 'Unknown network',
+      msgHistoryTitle: 'MESSAGE HISTORY',
+      historyMaxLabel: 'Max saved messages',
+      historyEmpty: 'No messages yet',
+      statusSent: 'Sent',
+      statusSending: 'Sending',
+      statusFailed: 'Failed',
+      syncFailed: 'Could not sync to computer',
+      deleteConfirm: 'Delete this message from history?',
+      deleted: 'Deleted',
+      deleteLabel: 'Delete',
+      msgDetailTitle: 'Message detail',
+      detailCloseAria: 'Close'
     },
     zh: {
       appName: 'TalkType',
@@ -383,12 +507,12 @@
       reconnecting: '重连中 ({count})...',
       cannotConnect: '无法连接',
       connFailed: '连接失败',
-      addHomeHint: '添加到主屏幕，像 App 一样一键打开',
       inputPh: '点击这里，用语音或键盘输入...',
       cleared: '已清空',
-      synced: '已同步 ✓',
+      dispatched: '已发送',
       connectedToast: '已连接到电脑',
       autoEnterLabel: '完成时自动回车',
+      saveHistoryLabel: '保存消息到本机',
       settingsTitle: '设置',
       connRecords: '连接记录',
       noConnRecords: '暂无连接记录',
@@ -401,7 +525,19 @@
       hoursAgo: '{n}小时前',
       daysAgo: '{n}天前',
       networkLabel: '网段 {net}.x',
-      unknownNetwork: '未知网络'
+      unknownNetwork: '未知网络',
+      msgHistoryTitle: '消息历史',
+      historyMaxLabel: '最多保存条数',
+      historyEmpty: '暂无消息',
+      statusSent: '已发送',
+      statusSending: '发送中',
+      statusFailed: '发送失败',
+      syncFailed: '未能同步到电脑',
+      deleteConfirm: '确定从列表中删除这条消息？',
+      deleted: '已删除',
+      deleteLabel: '删除',
+      msgDetailTitle: '消息详情',
+      detailCloseAria: '关闭'
     }
   };
 
@@ -436,12 +572,17 @@
     document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : 'ZH';
     refreshStatusFromKey();
     refreshFooterHostLine();
-    if (document.getElementById('sidePanel').classList.contains('visible')) renderConnections();
+    if (document.getElementById('sidePanel').classList.contains('visible')) {
+      renderConnections();
+      renderMessageHistory();
+    }
   }
 
   var KEY_CONNECTIONS = 'tt_connections';
-  var KEY_HOME_HINT = 'tt_home_hint_dismissed';
   var KEY_AUTO_ENTER = 'tt_auto_enter';
+  var KEY_SAVE_HISTORY = 'tt_save_message_history';
+  var KEY_MSG_HISTORY = 'tt_message_history';
+  var KEY_MSG_HISTORY_MAX = 'tt_message_history_max';
 
   var ws = null;
   var connected = false;
@@ -455,9 +596,18 @@
   var statusText = document.getElementById('statusText');
   var charCount = document.getElementById('charCount');
   var autoEnterCb = document.getElementById('autoEnterCb');
+  var saveHistoryCb = document.getElementById('saveHistoryCb');
+
+  var detailOpenMessageId = null;
 
   var savedAutoEnter = load(KEY_AUTO_ENTER);
   if (savedAutoEnter !== null) autoEnterCb.checked = savedAutoEnter;
+  var savedSaveHistory = load(KEY_SAVE_HISTORY);
+  if (savedSaveHistory !== null) saveHistoryCb.checked = !!savedSaveHistory;
+
+  function isSaveHistoryEnabled() {
+    return !!(saveHistoryCb && saveHistoryCb.checked);
+  }
 
   function setStatus(key, params) {
     currentStatusKey = key;
@@ -484,8 +634,9 @@
     applyI18n();
     connectWS();
     saveConnection();
-    showHomeHint();
     setupKeyboardHandling();
+    normalizeStaleSendingHistory();
+    restoreFailedDraftOnLoad();
     setTimeout(function() { textInput.focus(); }, 300);
   }
 
@@ -512,7 +663,7 @@
       textInput.value = '';
       charCount.textContent = '0';
       updateClearBtn();
-      toast(t('cleared'));
+      toast(t('cleared'), 'success');
       textInput.focus();
     });
 
@@ -520,13 +671,33 @@
       save(KEY_AUTO_ENTER, autoEnterCb.checked);
     });
 
+    saveHistoryCb.addEventListener('change', function() {
+      save(KEY_SAVE_HISTORY, saveHistoryCb.checked);
+    });
+
+    var historyMaxInput = document.getElementById('historyMaxInput');
+    function clampHistoryMaxInput() {
+      var v = parseInt(historyMaxInput.value, 10);
+      if (!isFinite(v) || v < 1) v = 100;
+      if (v > 500) v = 500;
+      historyMaxInput.value = String(v);
+      save(KEY_MSG_HISTORY_MAX, v);
+      var list = load(KEY_MSG_HISTORY) || [];
+      trimHistoryToMax(list);
+      save(KEY_MSG_HISTORY, list);
+      renderMessageHistory();
+    }
+    historyMaxInput.addEventListener('change', clampHistoryMaxInput);
+    historyMaxInput.addEventListener('blur', clampHistoryMaxInput);
+
     document.getElementById('settingsBtn').addEventListener('click', openPanel);
     document.getElementById('panelOverlay').addEventListener('click', closePanel);
     document.getElementById('panelCloseBtn').addEventListener('click', closePanel);
-    document.getElementById('dismissHintBtn').addEventListener('click', dismissHomeHint);
+
+    document.getElementById('msgDetailCloseBtn').addEventListener('click', closeMessageDetail);
 
     document.body.addEventListener('touchmove', function(e) {
-      var scrollable = e.target.closest('.text-input, .side-panel');
+      var scrollable = e.target.closest('.text-input, .side-panel, .msg-history-list, .msg-detail-body');
       if (!scrollable) e.preventDefault();
     }, { passive: false });
 
@@ -560,17 +731,30 @@
     }
   }
 
-  // ─── Sync ───
+  // ─── Sync (fire-and-forget over WS; input clears after send succeeds locally) ───
+
+  function genSendId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return String(Date.now()) + '-' + String(Math.floor(Math.random() * 1e9));
+  }
 
   function doSync() {
     if (!connected || !textInput.value.trim()) return;
     var text = textInput.value;
     var autoEnter = autoEnterCb.checked;
-    ws.send(JSON.stringify({ type: 'send', text: text, auto_enter: autoEnter }));
-    textInput.value = '';
-    charCount.textContent = '0';
-    updateClearBtn();
-    toast(t('synced'));
+    var id = genSendId();
+    try {
+      ws.send(JSON.stringify({ type: 'send', id: id, text: text, auto_enter: autoEnter }));
+      if (isSaveHistoryEnabled()) {
+        pushMessageHistory({ id: id, text: text, status: 'sent', ts: Date.now(), autoEnter: autoEnter });
+      }
+      textInput.value = '';
+      charCount.textContent = '0';
+      updateClearBtn();
+      toast(t('dispatched'), 'success');
+    } catch (err) {
+      toast(t('syncFailed'), 'error');
+    }
     textInput.focus();
   }
 
@@ -592,7 +776,7 @@
       reconnectAttempts = 0;
       statusDot.classList.add('connected');
       setStatus('connected');
-      toast(t('connectedToast'));
+      toast(t('connectedToast'), 'success');
       updateConnectionStatus(true);
     };
     ws.onmessage = function() {};
@@ -627,11 +811,158 @@
   function openPanel() {
     document.getElementById('panelOverlay').classList.add('visible');
     document.getElementById('sidePanel').classList.add('visible');
+    document.getElementById('historyMaxInput').value = String(getHistoryMax());
+    var sh = load(KEY_SAVE_HISTORY);
+    if (sh === null) saveHistoryCb.checked = true;
+    else saveHistoryCb.checked = !!sh;
     renderConnections();
+    renderMessageHistory();
   }
   function closePanel() {
     document.getElementById('panelOverlay').classList.remove('visible');
     document.getElementById('sidePanel').classList.remove('visible');
+  }
+
+  // ─── Message history (localStorage) ───
+
+  function getHistoryMax() {
+    var raw = load(KEY_MSG_HISTORY_MAX);
+    var n = typeof raw === 'number' ? raw : parseInt(raw, 10);
+    if (!isFinite(n) || n < 1) return 100;
+    if (n > 500) return 500;
+    return n;
+  }
+
+  function trimHistoryToMax(list) {
+    var max = getHistoryMax();
+    while (list.length > max) list.pop();
+  }
+
+  function normalizeStaleSendingHistory() {
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list) || !list.length) return;
+    var changed = false;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].status === 'sending') {
+        list[i].status = 'failed';
+        changed = true;
+      }
+    }
+    if (changed) save(KEY_MSG_HISTORY, list);
+  }
+
+  function restoreFailedDraftOnLoad() {
+    if (!isSaveHistoryEnabled()) return;
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list) || !list.length) return;
+    var latest = list[0];
+    if (latest && latest.status === 'failed' && latest.text) {
+      textInput.value = latest.text;
+      charCount.textContent = String(latest.text.length);
+      updateClearBtn();
+    }
+  }
+
+  function pushMessageHistory(entry) {
+    if (!isSaveHistoryEnabled()) return;
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list)) list = [];
+    list.unshift(entry);
+    trimHistoryToMax(list);
+    save(KEY_MSG_HISTORY, list);
+    renderMessageHistory();
+  }
+
+  function updateMessageHistoryById(id, patch) {
+    if (!id) return;
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list)) return;
+    var idx = list.findIndex(function(x) { return x.id === id; });
+    if (idx < 0) return;
+    Object.assign(list[idx], patch);
+    save(KEY_MSG_HISTORY, list);
+    renderMessageHistory();
+  }
+
+  function removeMessageHistoryById(id) {
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list)) return;
+    var next = list.filter(function(x) { return x.id !== id; });
+    save(KEY_MSG_HISTORY, next);
+    renderMessageHistory();
+  }
+
+  function getMessageById(id) {
+    var list = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(list)) return null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id) return list[i];
+    }
+    return null;
+  }
+
+  function renderMessageHistory() {
+    var wrap = document.getElementById('messageHistoryList');
+    if (!wrap) return;
+    var items = load(KEY_MSG_HISTORY) || [];
+    if (!Array.isArray(items) || !items.length) {
+      wrap.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">' + esc(t('historyEmpty')) + '</div>';
+      return;
+    }
+    var html = '';
+    items.forEach(function(m) {
+      var stKey = m.status === 'sent' ? 'statusSent' : (m.status === 'sending' ? 'statusSending' : 'statusFailed');
+      var preview = (m.text || '').replace(/\s+/g, ' ');
+      if (preview.length > 120) preview = preview.slice(0, 120) + '…';
+      html += '<div class="msg-row" data-id="' + esc(m.id) + '">' +
+        '<div class="msg-row-main">' +
+        '<div class="msg-row-text" title="' + esc(m.text || '') + '">' + esc(preview) + '</div>' +
+        '<div class="msg-row-meta">' + esc(t(stKey)) + ' · ' + esc(timeAgo(m.ts || Date.now())) + '</div>' +
+        '</div>' +
+        '<div class="msg-row-actions">' +
+        '<button type="button" class="icon-act danger msg-del" aria-label="' + esc(t('deleteLabel')) + '" data-id="' + esc(m.id) + '">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+        '</div></div>';
+    });
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.msg-row').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        if (e.target.closest('.msg-row-actions')) return;
+        var mid = row.getAttribute('data-id');
+        if (mid) openMessageDetail(mid);
+      });
+    });
+    wrap.querySelectorAll('.msg-del').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var mid = btn.getAttribute('data-id');
+        if (!mid) return;
+        if (!confirm(t('deleteConfirm'))) return;
+        removeMessageHistoryById(mid);
+        toast(t('deleted'), 'success');
+      });
+    });
+  }
+
+  function openMessageDetail(id) {
+    var rec = getMessageById(id);
+    if (!rec) return;
+    detailOpenMessageId = id;
+    var body = document.getElementById('msgDetailBody');
+    body.textContent = rec.text || '';
+    var ov = document.getElementById('msgDetailOverlay');
+    ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
+    document.getElementById('msgDetailTitle').textContent = t('msgDetailTitle');
+    document.getElementById('msgDetailCloseBtn').setAttribute('aria-label', t('detailCloseAria'));
+  }
+
+  function closeMessageDetail() {
+    detailOpenMessageId = null;
+    var ov = document.getElementById('msgDetailOverlay');
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
+    document.getElementById('msgDetailBody').textContent = '';
   }
 
   // ─── Connection Records ───
@@ -717,27 +1048,24 @@
     return (!netId || netId === 'unknown') ? t('unknownNetwork') : t('networkLabel', { net: netId });
   }
 
-  // ─── Home Screen Hint ───
-
-  function showHomeHint() {
-    if (load(KEY_HOME_HINT)) return;
-    var isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isMobile && !isStandalone) document.getElementById('addHomeHint').style.display = 'flex';
-  }
-  function dismissHomeHint() {
-    document.getElementById('addHomeHint').style.display = 'none';
-    save(KEY_HOME_HINT, true);
-  }
-
   // ─── Utils ───
 
-  function toast(msg) {
+  function toast(msg, kind) {
     var el = document.getElementById('toast');
+    if (!kind || (kind !== 'success' && kind !== 'warning' && kind !== 'error')) kind = 'success';
     el.textContent = msg;
-    el.classList.add('show');
+    el.classList.remove('toast--success', 'toast--warning', 'toast--error', 'show');
+    el.classList.add('toast--' + kind);
     clearTimeout(el._timer);
-    el._timer = setTimeout(function() { el.classList.remove('show'); }, 1400);
+    clearTimeout(el._showTimer);
+    el._showTimer = setTimeout(function() {
+      el.classList.add('show');
+      var len = String(msg || '').length;
+      var ms = Math.min(9000, Math.max(2400, 1100 + len * 38));
+      el._timer = setTimeout(function() {
+        el.classList.remove('show');
+      }, ms);
+    }, 30);
   }
   function timeAgo(ts) {
     var d = Date.now() - ts;

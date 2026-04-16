@@ -114,18 +114,16 @@ jobs:
             > Global voice input for vibe coding.
 
             ### What's New
-            * Auto-refresh local IP, URL, and QR when the network changes (5s poll + `network-info-changed` event)
-            * Tray menu: **Refresh Network**; new `refresh_network_info` command
-            * `/api/info` and `get_server_info` now include `ips`; cached IP list kept in sync with OS
-            * Desktop URL bar: icon buttons for refresh (with spinner + minimum loading time) and copy (checkmark feedback, fixed 30×30 layout)
-            * Settings: **Check for Updates** shows current version (e.g. `v1.9.0`)
+            * Mobile web: **message history** (optional local save + max count), **detail** overlay (tap a row), delete from list; **Toasts** top-right with slide-in and **success / warning / error** styling
+            * Mobile: input **clears right after send** over WebSocket; **removed** clipboard-based copy (avoids extra permissions on LAN HTTP)
+            * WebSocket **`send`** is fire-and-forget: desktop simulates typing in a **background** `spawn_blocking` task; failures are **logged on the server** (no `send_ack` round-trip)
+            * `keyboard::type_text` returns **`Result`** for structured errors in desktop logs
 
             ### 更新内容
-            * 网络环境变化时自动刷新本机 IP、地址与二维码（约 5 秒轮询 + `network-info-changed` 事件）
-            * 托盘新增 **Refresh Network**；新增 `refresh_network_info` 命令
-            * `/api/info` 与 `get_server_info` 返回 `ips` 列表；与系统网卡列表保持同步
-            * 桌面地址栏：刷新与复制改为图标按钮（刷新带转圈 loading 与最短展示时长；复制以对号反馈、固定 30×30 避免抖动）
-            * 设置中「检查更新」展示当前版本号（如 `v1.9.0`）
+            * 手机网页：**消息历史**（可选是否写入本机、可设最多条数）、**全文详情**（点击整行进入）、列表内删除；**Toast** 改为右上角滑入，并区分 **成功 / 警告 / 错误** 配色
+            * 手机端：WebSocket **发出后即清空输入**；**移除**依赖剪贴板的复制（避免局域网 HTTP 下额外权限问题）
+            * WebSocket **`send`** 为单向投递：电脑端在后台 **`spawn_blocking`** 中模拟输入，错误仅在**服务端日志**记录（**无 `send_ack` 回包**）
+            * `keyboard::type_text` 返回 **`Result`**，便于桌面端记录结构化错误
 
             ### Download
             | Platform | File |
