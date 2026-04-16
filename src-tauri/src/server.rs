@@ -52,12 +52,18 @@ async fn serve_info() -> Json<serde_json::Value> {
     let state = crate::SERVER_STATE.lock();
     let url = format!("http://{}:{}", state.local_ip, state.port);
     let qr = crate::qrcode_gen::generate_qr_data_url(&url).unwrap_or_default();
+    let ips = if state.cached_ips.is_empty() {
+        crate::network::get_all_local_ips()
+    } else {
+        state.cached_ips.clone()
+    };
     Json(serde_json::json!({
         "name": "TalkType",
         "ip": state.local_ip,
         "port": state.port,
         "url": url,
         "qrcode": qr,
+        "ips": ips,
         "version": "1.0.0"
     }))
 }

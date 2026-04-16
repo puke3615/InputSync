@@ -75,10 +75,47 @@
     flex: 1; font-size: 13px; color: var(--primary); font-weight: 600;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .url-bar button {
-    font-size: 11px; font-weight: 600; color: var(--primary); background: var(--primary-bg);
-    border: none; border-radius: 5px; padding: 4px 8px; cursor: pointer; flex-shrink: 0;
+  .url-bar-icon-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    cursor: pointer;
   }
+  .url-bar-icon-btn:hover { filter: brightness(0.97); }
+  .url-bar-icon-btn:disabled { opacity: 0.45; cursor: default; }
+  .url-bar-icon-btn.is-copied {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+  .url-bar-icon-btn svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+  .url-bar-icon-btn .url-bar-icon-btn__check { display: none; }
+  .url-bar-icon-btn.is-copied .url-bar-icon-btn__copy { display: none; }
+  .url-bar-icon-btn.is-copied .url-bar-icon-btn__check { display: block; }
+  .url-bar-icon-btn svg.url-bar-icon-btn__refresh-spinner { display: none; }
+  .url-bar-icon-btn.is-refreshing {
+    pointer-events: none;
+    cursor: default;
+    opacity: 1;
+  }
+  .url-bar-icon-btn.is-refreshing .url-bar-icon-btn__refresh-icon { display: none; }
+  .url-bar-icon-btn.is-refreshing svg.url-bar-icon-btn__refresh-spinner {
+    display: block;
+    animation: url-bar-icon-spin 0.65s linear infinite;
+  }
+  @keyframes url-bar-icon-spin { to { transform: rotate(360deg); } }
   .ip-bar {
     display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 12px;
   }
@@ -181,7 +218,14 @@
       </div>
       <div class="url-bar">
         <code id="urlText">-</code>
-        <button id="copyBtn" data-i18n="copyBtn"></button>
+        <button type="button" id="refreshNetBtn" class="url-bar-icon-btn" style="display:none;" data-i18n="refreshNetworkTitle" data-i18n-attr="title" title="">
+          <svg class="url-bar-icon-btn__refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+          <svg class="url-bar-icon-btn__refresh-spinner" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="40" stroke-dashoffset="10"/></svg>
+        </button>
+        <button type="button" id="copyBtn" class="url-bar-icon-btn" data-i18n="copyBtnTitle" data-i18n-attr="title" title="">
+          <svg class="url-bar-icon-btn__copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <svg class="url-bar-icon-btn__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
       </div>
       <div class="ip-bar" id="ipBar" style="display:none;">
         <label data-i18n="ipLabel"></label>
@@ -218,7 +262,7 @@
     <div class="page-inner">
       <div class="settings-section">
         <div class="settings-section-title" data-i18n="generalSettings"></div>
-        <button class="settings-btn" id="checkUpdatesBtn" data-i18n="checkUpdates"></button>
+        <button type="button" class="settings-btn" id="checkUpdatesBtn"></button>
       </div>
     </div>
   </div>
@@ -236,9 +280,9 @@
       loaderError: 'Start error: ',
       debugToggle: 'Debug Log',
       qrTip: 'Scan with phone to connect',
-      copyBtn: 'Copy',
-      copied: 'Copied ✓',
+      copyBtnTitle: 'Copy link',
       ipLabel: 'Network:',
+      refreshNetworkTitle: 'Refresh network address',
       statusWaiting: 'Waiting for phone...',
       statusConnected: '{count} device(s) connected',
       permTitle: '⚠️ Accessibility Permission Required',
@@ -248,7 +292,7 @@
       hint: 'Scan QR with your phone, speak instead of type',
       settings: 'Settings',
       generalSettings: 'GENERAL',
-      checkUpdates: '🔄 Check for Updates',
+      checkUpdates: '🔄 Check for Updates ({version})',
       backTitle: 'Back',
       footerOpenSource: 'Open source on GitHub'
     },
@@ -261,9 +305,9 @@
       loaderError: '启动异常: ',
       debugToggle: '调试日志',
       qrTip: '手机扫码连接',
-      copyBtn: '复制',
-      copied: '已复制 ✓',
+      copyBtnTitle: '复制链接',
       ipLabel: '网卡:',
+      refreshNetworkTitle: '刷新网络地址',
       statusWaiting: '等待手机连接',
       statusConnected: '{count} 台设备已连接',
       permTitle: '⚠️ 需要辅助功能权限',
@@ -273,7 +317,7 @@
       hint: '手机扫描二维码，用语音输入替代键盘打字',
       settings: '设置',
       generalSettings: '通用设置',
-      checkUpdates: '🔄 检查更新',
+      checkUpdates: '🔄 检查更新 ({version})',
       backTitle: '返回',
       footerOpenSource: '在 GitHub 上开源'
     }
@@ -316,6 +360,13 @@
       esc(t('footerOpenSource')) + '</a>';
   }
 
+  function updateCheckUpdatesBtnLabel() {
+    var el = document.getElementById('checkUpdatesBtn');
+    if (!el) return;
+    var v = appVersion ? ('v' + String(appVersion)) : '—';
+    el.textContent = t('checkUpdates', { version: v });
+  }
+
   function applyI18n() {
     document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-CN' : 'en');
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -331,6 +382,7 @@
     updateLangToggleButtons();
     updateStatusLabel();
     updateFooter();
+    updateCheckUpdatesBtnLabel();
   }
 
   function switchLang(lang) {
@@ -345,6 +397,8 @@
   });
 
   var logs = [], debugVisible = false, invoke = null, listen = null, serverUrl = '', serverPort = 5678;
+  var copyFeedbackTimer = null;
+  var MIN_REFRESH_LOADING_MS = 500;
 
   function showPage(id) {
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -367,6 +421,31 @@
   function showLoader(m) { document.getElementById('loader').classList.remove('hide'); document.getElementById('loaderMsg').textContent = m; }
   function hideLoader() { document.getElementById('loader').classList.add('hide'); document.getElementById('content').style.display = ''; }
   function showError(m) { document.getElementById('loaderMsg').textContent = m; document.getElementById('spinner').style.display = 'none'; }
+
+  async function applyNetworkFromPayload(info) {
+    if (!info || !info.ip) return;
+    var ips = (info.ips && info.ips.length) ? info.ips.slice() : [info.ip];
+    var sel = document.getElementById('ipSel');
+    var prev = sel.value;
+    var pick = (prev && ips.indexOf(prev) >= 0) ? prev : info.ip;
+    sel.innerHTML = '';
+    ips.forEach(function(ip) {
+      var o = document.createElement('option');
+      o.value = ip; o.textContent = ip;
+      if (ip === pick) o.selected = true;
+      sel.appendChild(o);
+    });
+    serverPort = info.port != null ? info.port : 5678;
+    serverUrl = 'http://' + pick + ':' + serverPort;
+    document.getElementById('urlText').textContent = serverUrl;
+    var qrSrc = info.qrcode_data_url || info.qrcode;
+    if (invoke && pick !== info.ip) {
+      try { qrSrc = await invoke('generate_qr', { url: serverUrl }); } catch(e) {}
+    }
+    if (qrSrc) document.getElementById('qrImg').src = qrSrc;
+    document.getElementById('ipBar').style.display = ips.length > 1 ? '' : 'none';
+    log('Network UI: ' + serverUrl);
+  }
 
   async function init() {
     log('App starting...'); showLoader(t('loaderStarting'));
@@ -394,13 +473,15 @@
     log('URL: ' + info.url);
 
     var ips = [];
-    if (hasTauri) { try { ips = await invoke('get_local_ips'); } catch(e) {} }
+    if (info.ips && info.ips.length) ips = info.ips;
+    else if (hasTauri) { try { ips = await invoke('get_local_ips'); } catch(e) {} }
     if (ips.length === 0 && info.ip) ips = [info.ip];
     var sel = document.getElementById('ipSel'); sel.innerHTML = '';
     ips.forEach(function(ip) { var o = document.createElement('option'); o.value = ip; o.textContent = ip; if (ip === info.ip) o.selected = true; sel.appendChild(o); });
     if (ips.length > 1) document.getElementById('ipBar').style.display = '';
 
     if (invoke) { try { appVersion = await invoke('get_app_version'); } catch(e) {} }
+    if (!appVersion && info.version) appVersion = String(info.version);
     applyI18n();
     hideLoader();
 
@@ -412,17 +493,45 @@
           if (c > 0) { b.className = 'status ok'; l.textContent = t('statusConnected', { count: c }); }
           else { b.className = 'status wait'; l.textContent = t('statusWaiting'); }
         });
+        listen('network-info-changed', function(ev) {
+          applyNetworkFromPayload(ev.payload).catch(function(e) { log('network-info-changed: ' + (e && e.message)); });
+        });
       } catch(e) {}
     }
 
     if (hasTauri) {
+      var rbtn = document.getElementById('refreshNetBtn');
+      rbtn.style.display = '';
+      rbtn.addEventListener('click', async function() {
+        if (!invoke || rbtn.classList.contains('is-refreshing')) return;
+        rbtn.classList.add('is-refreshing');
+        rbtn.setAttribute('aria-busy', 'true');
+        var t0 = Date.now();
+        try {
+          var nfo = await invoke('refresh_network_info');
+          await applyNetworkFromPayload(nfo);
+        } catch(e) { log('Refresh network failed: ' + (e && e.message)); }
+        var elapsed = Date.now() - t0;
+        if (elapsed < MIN_REFRESH_LOADING_MS) await sleep(MIN_REFRESH_LOADING_MS - elapsed);
+        rbtn.classList.remove('is-refreshing');
+        rbtn.removeAttribute('aria-busy');
+      });
       try { var ok = await invoke('check_accessibility'); document.getElementById('permBox').style.display = ok ? 'none' : ''; } catch(e) {}
     }
     applyI18n();
   }
 
   document.getElementById('copyBtn').addEventListener('click', async function() {
-    try { await navigator.clipboard.writeText(serverUrl); this.textContent = t('copied'); var b = this; setTimeout(function() { b.textContent = t('copyBtn'); }, 1200); } catch(e) {}
+    var btn = this;
+    try {
+      await navigator.clipboard.writeText(serverUrl);
+      btn.classList.add('is-copied');
+      if (copyFeedbackTimer) clearTimeout(copyFeedbackTimer);
+      copyFeedbackTimer = setTimeout(function() {
+        btn.classList.remove('is-copied');
+        copyFeedbackTimer = null;
+      }, 1200);
+    } catch(e) {}
   });
   document.getElementById('ipSel').addEventListener('change', async function() {
     var ip = this.value; serverUrl = 'http://' + ip + ':' + serverPort;
